@@ -8,7 +8,7 @@ Currently, ShitRust is in development, but you can build it from source:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/shitrust.git
+git clone https://github.com/Waowzar/shitrust.git
 cd shitrust
 
 # Build the compiler
