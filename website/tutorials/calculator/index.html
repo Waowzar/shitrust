@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShitRust - Command-Line Calculator Tutorial</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="../../images/icon.svg" type="image/svg+xml">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../css/style.css">
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Prism.js for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo-container">
+          <img src="../../images/icon.svg" alt="ShitRust Logo" class="logo">
+          <span class="logo-text">ShitRust</span>
+        </div>
+        
+        <button class="hamburger">
+          <i class="fas fa-bars"></i>
+        </button>
+        
+        <ul class="nav-links">
+          <li><a href="../../index.html#features">Features</a></li>
+          <li><a href="../../index.html#installation">Installation</a></li>
+          <li><a href="../../index.html#examples">Examples</a></li>
+          <li><a href="../../index.html#documentation">Documentation</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+  <!-- Tutorial Content -->
+  <section class="documentation-content">
+    <div class="container">
+      <div class="documentation-header">
+        <h1>Building a Command-Line Calculator</h1>
+        <p>Learn how to create a simple calculator application using ShitRust's basic features.</p>
+      </div>
+
+      <div class="doc-nav">
+        <ul>
+          <li><a href="#introduction">Introduction</a></li>
+          <li><a href="#setup">Setup</a></li>
+          <li><a href="#basic-structure">Basic Structure</a></li>
+          <li><a href="#input-parsing">Input Parsing</a></li>
+          <li><a href="#calculation">Calculation Logic</a></li>
+          <li><a href="#main-program">Main Program Loop</a></li>
+          <li><a href="#complete-code">Complete Code</a></li>
+          <li><a href="#running">Running the Program</a></li>
+          <li><a href="#extensions">Extensions</a></li>
+        </ul>
+      </div>
+      
+      <div class="doc-content">
+        <section id="introduction">
+          <h2>Introduction</h2>
+          <p>In this tutorial, we'll build a simple command-line calculator that can perform basic arithmetic operations. This project will demonstrate:</p>
+          
+          <ul>
+            <li>Reading user input</li>
+            <li>String manipulation and parsing</li>
+            <li>Basic error handling with the <code>result</code> type</li>
+            <li>Control flow with <code>match</code> expressions</li>
+            <li>Basic arithmetic operations</li>
+          </ul>
+          
+          <p>By the end of this tutorial, you'll have a fully functional calculator program that can add, subtract, multiply, and divide numbers.</p>
+        </section>
+        
+        <section id="setup">
+          <h2>Setup</h2>
+          <p>First, make sure you have ShitRust installed on your system. If not, follow the <a href="../../index.html#installation">installation instructions</a>.</p>
+          
+          <p>Create a new file called <code>calculator.sr</code>. We'll start by importing the standard I/O library to handle user input and output:</p>
+          
+          <pre><code class="language-rust">// Import standard input/output library
+import { stdin, stdout } from "std/io";</code></pre>
+        </section>
+        
+        <section id="basic-structure">
+          <h2>Basic Structure</h2>
+          <p>Let's start by defining a function to display welcome messages and instructions to the user:</p>
+          
+          <pre><code class="language-rust">// Function to display welcome message and instructions
+fn show_welcome() -> void {
+    println("===== ShitRust Calculator =====");
+    println("Enter an expression with two numbers and an operator.");
+    println("Example: 5 + 3");
+    println("Supported operators: +, -, *, /");
+    println("Type 'exit' to quit.");
+    println("==============================");
+}</code></pre>
+          
+          <p>This function uses the <code>println</code> function to display text to the console. The <code>-> void</code> return type indicates that this function doesn't return a value.</p>
+        </section>
+        
+        <section id="input-parsing">
+          <h2>Input Parsing</h2>
+          <p>Next, we'll create a function to parse the user's input. This function will:</p>
+          <ol>
+            <li>Split the input string into parts</li>
+            <li>Extract the first number, operator, and second number</li>
+            <li>Return a result type with either the parsed values or an error message</li>
+          </ol>
+          
+          <pre><code class="language-rust">// Function to parse user input and extract operation components
+fn parse_input(input: string) -> result<(float, string, float), string> {
+    // Trim input and split by spaces
+    let trimmed = input.trim();
+    let parts = trimmed.split(" ");
+    
+    if parts.length() != 3 {
+        return err("Invalid input format. Please use: number operator number");
+    }
+    
+    // Parse the first number
+    let first_num = parts[0].parse_float();
+    if first_num.is_err() {
+        return err("Invalid first number");
+    }
+    
+    // Get the operator
+    let operator = parts[1];
+    if operator != "+" && operator != "-" && operator != "*" && operator != "/" {
+        return err("Invalid operator. Use +, -, *, or /");
+    }
+    
+    // Parse the second number
+    let second_num = parts[2].parse_float();
+    if second_num.is_err() {
+        return err("Invalid second number");
+    }
+    
+    return ok((first_num.unwrap(), operator, second_num.unwrap()));
+}</code></pre>
+          
+          <p>This function returns a <code>result</code> type, which is ShitRust's way of handling operations that might fail. The result contains either:</p>
+          <ul>
+            <li>An <code>ok</code> value with a tuple containing the two numbers and the operator</li>
+            <li>An <code>err</code> value with an error message</li>
+          </ul>
+        </section>
+        
+        <section id="calculation">
+          <h2>Calculation Logic</h2>
+          <p>Now we'll implement the function that performs the actual calculation:</p>
+          
+          <pre><code class="language-rust">// Function to perform the calculation
+fn calculate(a: float, op: string, b: float) -> result<float, string> {
+    match op {
+        "+" => return ok(a + b),
+        "-" => return ok(a - b),
+        "*" => return ok(a * b),
+        "/" => {
+            if b == 0.0 {
+                return err("Division by zero is not allowed");
+            }
+            return ok(a / b);
+        },
+        _ => return err("Unsupported operator")
+    }
+}</code></pre>
+          
+          <p>This function uses pattern matching with a <code>match</code> expression to handle different operators. It also returns a <code>result</code> type, allowing us to handle errors like division by zero.</p>
+        </section>
+        
+        <section id="main-program">
+          <h2>Main Program Loop</h2>
+          <p>Finally, let's implement the main function that ties everything together:</p>
+          
+          <pre><code class="language-rust">// Main function
+fn main() -> void {
+    show_welcome();
+    
+    // Main program loop
+    let mut running = true;
+    while (running) {
+        // Prompt for input
+        print("> ");
+        let input = stdin.read_line();
+        
+        // Check for exit command
+        if input.trim().to_lowercase() == "exit" {
+            println("Goodbye!");
+            running = false;
+            continue;
+        }
+        
+        // Parse input and calculate
+        let parse_result = parse_input(input);
+        
+        match parse_result {
+            ok((a, op, b)) => {
+                let calc_result = calculate(a, op, b);
+                
+                match calc_result {
+                    ok(result) => {
+                        println("Result: " + result.to_string());
+                    },
+                    err(error_msg) => {
+                        println("Error: " + error_msg);
+                    }
+                }
+            },
+            err(error_msg) => {
+                println("Error: " + error_msg);
+            }
+        }
+        
+        println(""); // Empty line for better readability
+    }
+}</code></pre>
+          
+          <p>The main function:</p>
+          <ol>
+            <li>Displays the welcome message</li>
+            <li>Enters a loop that continues until the user types "exit"</li>
+            <li>Reads user input, parses it, and performs the calculation</li>
+            <li>Handles errors at each step and displays appropriate messages</li>
+          </ol>
+        </section>
+        
+        <section id="complete-code">
+          <h2>Complete Code</h2>
+          <p>Here's the complete code for our calculator program:</p>
+          
+          <pre><code class="language-rust">// ShitRust Command-Line Calculator
+// This program demonstrates basic input/output and arithmetic operations
+
+// Import standard input/output library
+import { stdin, stdout } from "std/io";
+
+// Function to display welcome message and instructions
+fn show_welcome() -> void {
+    println("===== ShitRust Calculator =====");
+    println("Enter an expression with two numbers and an operator.");
+    println("Example: 5 + 3");
+    println("Supported operators: +, -, *, /");
+    println("Type 'exit' to quit.");
+    println("==============================");
+}
+
+// Function to parse user input and extract operation components
+fn parse_input(input: string) -> result<(float, string, float), string> {
+    // Trim input and split by spaces
+    let trimmed = input.trim();
+    let parts = trimmed.split(" ");
+    
+    if parts.length() != 3 {
+        return err("Invalid input format. Please use: number operator number");
+    }
+    
+    // Parse the first number
+    let first_num = parts[0].parse_float();
+    if first_num.is_err() {
+        return err("Invalid first number");
+    }
+    
+    // Get the operator
+    let operator = parts[1];
+    if operator != "+" && operator != "-" && operator != "*" && operator != "/" {
+        return err("Invalid operator. Use +, -, *, or /");
+    }
+    
+    // Parse the second number
+    let second_num = parts[2].parse_float();
+    if second_num.is_err() {
+        return err("Invalid second number");
+    }
+    
+    return ok((first_num.unwrap(), operator, second_num.unwrap()));
+}
+
+// Function to perform the calculation
+fn calculate(a: float, op: string, b: float) -> result<float, string> {
+    match op {
+        "+" => return ok(a + b),
+        "-" => return ok(a - b),
+        "*" => return ok(a * b),
+        "/" => {
+            if b == 0.0 {
+                return err("Division by zero is not allowed");
+            }
+            return ok(a / b);
+        },
+        _ => return err("Unsupported operator")
+    }
+}
+
+// Main function
+fn main() -> void {
+    show_welcome();
+    
+    // Main program loop
+    let mut running = true;
+    while (running) {
+        // Prompt for input
+        print("> ");
+        let input = stdin.read_line();
+        
+        // Check for exit command
+        if input.trim().to_lowercase() == "exit" {
+            println("Goodbye!");
+            running = false;
+            continue;
+        }
+        
+        // Parse input and calculate
+        let parse_result = parse_input(input);
+        
+        match parse_result {
+            ok((a, op, b)) => {
+                let calc_result = calculate(a, op, b);
+                
+                match calc_result {
+                    ok(result) => {
+                        println("Result: " + result.to_string());
+                    },
+                    err(error_msg) => {
+                        println("Error: " + error_msg);
+                    }
+                }
+            },
+            err(error_msg) => {
+                println("Error: " + error_msg);
+            }
+        }
+        
+        println(""); // Empty line for better readability
+    }
+}</code></pre>
+        </section>
+        
+        <section id="running">
+          <h2>Running the Program</h2>
+          <p>To run the calculator program:</p>
+          
+          <ol>
+            <li>Save the code in a file named <code>calculator.sr</code></li>
+            <li>Open a terminal and navigate to the directory containing your file</li>
+            <li>Compile and run the program with the following command:</li>
+          </ol>
+          
+          <pre><code class="language-bash">shitrust run calculator.sr</code></pre>
+          
+          <p>You should see the welcome message, and you can start entering calculations. For example:</p>
+          
+          <pre><code>> 5 + 3
+Result: 8
+
+> 10 / 2
+Result: 5
+
+> 7 * 6
+Result: 42
+
+> 10 / 0
+Error: Division by zero is not allowed
+
+> exit
+Goodbye!</code></pre>
+        </section>
+        
+        <section id="extensions">
+          <h2>Extensions and Challenges</h2>
+          <p>Now that you've built a basic calculator, here are some ideas to extend and improve it:</p>
+          
+          <ol>
+            <li>Add support for more operations (modulo, exponentiation, etc.)</li>
+            <li>Implement memory functions (store values, recall them later)</li>
+            <li>Support more complex expressions with multiple operations</li>
+            <li>Add a history feature to recall previous calculations</li>
+            <li>Implement unit conversions (temperature, length, etc.)</li>
+          </ol>
+          
+          <p>These extensions will give you more practice with ShitRust and help you build a more powerful calculator application.</p>
+        </section>
+        
+        <section>
+          <h2>Next Steps</h2>
+          <p>Congratulations on completing your first ShitRust tutorial! You've built a functional calculator application and learned about several key features of the language.</p>
+          
+          <p>Check out our other tutorials to continue your ShitRust journey:</p>
+          
+          <ul>
+            <li><a href="../todo/index.html">Creating a Todo List Manager</a></li>
+            <li><a href="../adventure/index.html">Building a Text Adventure Game</a></li>
+          </ul>
+          
+          <p>Or explore the <a href="../../reference.html">Language Reference</a> to learn more about ShitRust's features.</p>
+        </section>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>ShitRust</h3>
+          <p>A programming language combining features from Rust, Python, and C/C++.</p>
+          <p>Released under the <a href="#">MIT License</a>.</p>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="../../index.html#features">Features</a></li>
+            <li><a href="../../index.html#installation">Installation</a></li>
+            <li><a href="../../index.html#examples">Examples</a></li>
+            <li><a href="../../index.html#documentation">Documentation</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Documentation</h3>
+          <ul class="footer-links">
+            <li><a href="../../guide.html">Guide</a></li>
+            <li><a href="../../reference.html">Reference</a></li>
+            <li><a href="../../api.html">API</a></li>
+            <li><a href="../../tutorials.html">Tutorials</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Developer</h3>
+          <ul class="footer-links">
+            <li><a href="https://github.com/._w0wzers">._w0wzers</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2023 ShitRust Language. Developed by ._w0wzers. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-batch.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html> 

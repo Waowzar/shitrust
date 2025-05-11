@@ -1,0 +1,239 @@
+// ShitRust Advanced Features Demo - 2.0
+// This example demonstrates the new enhanced features of ShitRust
+
+// Module imports with the new 'use' keyword
+use std.io;
+use std.collections.HashMap;
+use std.time as timing;
+
+// Constants declaration
+const PI: float = 3.14159265359;
+const MAX_USERS: int = 1000;
+const APP_NAME: string = "ShitRust Advanced Demo";
+
+// Type aliases
+type UserId = int;
+type UserName = string;
+type UserMap<T> = HashMap<UserId, T>;
+
+// Trait definition
+trait Printable {
+    fn print() -> void;
+    fn debug_print() -> string;
+}
+
+// Generic trait
+trait Container<T> {
+    fn add(item: T) -> void;
+    fn get(index: int) -> T;
+    fn size() -> int;
+}
+
+// Struct with generic parameter
+struct User<T> {
+    id: UserId,
+    name: UserName,
+    data: T,
+    active: bool,
+    
+    // Method using 'this' keyword
+    fn is_active() -> bool {
+        return this.active;
+    }
+    
+    // Static method
+    static fn create(id: UserId, name: UserName, data: T) -> User<T> {
+        return User {
+            id: id,
+            name: name,
+            data: data,
+            active: true
+        };
+    }
+}
+
+// Implementing a trait for a struct
+impl Printable for User<string> {
+    fn print() -> void {
+        println("User: " + this.name + " (ID: " + this.id.to_string() + ")");
+    }
+    
+    fn debug_print() -> string {
+        return "User { id: " + this.id.to_string() + 
+               ", name: " + this.name + 
+               ", data: " + this.data +
+               ", active: " + this.active.to_string() + " }";
+    }
+}
+
+// Enum with generic parameter
+enum Result<T, E> {
+    Ok(T),
+    Err(E)
+}
+
+// Function returning a Result type
+fn divide(a: int, b: int) -> Result<int, string> {
+    if b == 0 {
+        return Result::Err("Division by zero");
+    }
+    return Result::Ok(a / b);
+}
+
+// Async function example
+async fn fetch_data(url: string) -> Result<string, string> {
+    // Simulating network request with delay
+    await timing.sleep(1000);
+    
+    if url.contains("error") {
+        return Result::Err("Failed to fetch data");
+    }
+    
+    return Result::Ok("Data from " + url);
+}
+
+// Function demonstrating list comprehension
+fn list_comprehension_demo() -> void {
+    let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    
+    // List comprehension with filter
+    let evens = [x for x in numbers if x % 2 == 0];
+    println("Even numbers: " + evens.to_string());
+    
+    // List comprehension with transformation
+    let squares = [x * x for x in numbers];
+    println("Squares: " + squares.to_string());
+    
+    // Nested list comprehension
+    let matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+    let flattened = [cell for row in matrix for cell in row];
+    println("Flattened matrix: " + flattened.to_string());
+}
+
+// Function demonstrating match expressions
+fn match_demo(value: int) -> string {
+    let result = match value {
+        0 => "Zero",
+        1 | 2 | 3 => "Small number",
+        n if n < 10 => "Single digit",
+        n if n % 2 == 0 => "Even number",
+        _ => "Other number"
+    };
+    
+    return result;
+}
+
+// Function demonstrating pipeline operator
+fn pipeline_demo() -> void {
+    let names = ["Alice", "Bob", "Charlie", "David"];
+    
+    // Using pipeline operator
+    let result = names
+        |> [name.to_upper() for name in _]
+        |> [name for name in _ if name.length() > 4]
+        |> _.join(", ");
+    
+    println("Pipeline result: " + result);
+}
+
+// Function demonstrating optional chaining
+fn optional_chaining_demo(user: User<string>?) -> void {
+    // Optional chaining
+    let username = user?.name ?? "Unknown user";
+    println("Username: " + username);
+    
+    // Optional method call
+    let is_active = user?.is_active() ?? false;
+    println("Is active: " + is_active.to_string());
+}
+
+// Main function
+fn main() -> void {
+    println("===== ShitRust Advanced Features Demo 2.0 =====\n");
+    
+    // Using constants
+    println("Application: " + APP_NAME);
+    println("Pi value: " + PI.to_string());
+    println("Max users: " + MAX_USERS.to_string() + "\n");
+    
+    // Creating a user
+    let user = User::create(1, "John Doe", "Developer");
+    println("Created user: " + user.name);
+    
+    // Using Printable trait
+    user.print();
+    println("Debug info: " + user.debug_print() + "\n");
+    
+    // List comprehension
+    println("--- List Comprehension Demo ---");
+    list_comprehension_demo();
+    println();
+    
+    // Match expression
+    println("--- Match Expression Demo ---");
+    for i in 0..15 {
+        println(i.to_string() + ": " + match_demo(i));
+    }
+    println();
+    
+    // Result handling
+    println("--- Result Handling Demo ---");
+    let div_result = divide(10, 2);
+    match div_result {
+        Result::Ok(value) => println("10 / 2 = " + value.to_string()),
+        Result::Err(err) => println("Error: " + err)
+    }
+    
+    let div_error = divide(10, 0);
+    match div_error {
+        Result::Ok(value) => println("10 / 0 = " + value.to_string()),
+        Result::Err(err) => println("Error: " + err)
+    }
+    println();
+    
+    // Try-catch error handling
+    println("--- Try-Catch Demo ---");
+    try {
+        let result = 10 / 0;
+        println("Result: " + result.to_string());
+    } catch e {
+        println("Exception caught: " + e.to_string());
+    } finally {
+        println("This runs regardless of exception");
+    }
+    println();
+    
+    // Async/await
+    println("--- Async/Await Demo ---");
+    println("Fetching data...");
+    
+    let data_result = await fetch_data("https://example.com/api");
+    match data_result {
+        Result::Ok(data) => println("Success: " + data),
+        Result::Err(err) => println("Error: " + err)
+    }
+    
+    let error_result = await fetch_data("https://example.com/error");
+    match error_result {
+        Result::Ok(data) => println("Success: " + data),
+        Result::Err(err) => println("Error: " + err)
+    }
+    println();
+    
+    // Pipeline operator
+    println("--- Pipeline Operator Demo ---");
+    pipeline_demo();
+    println();
+    
+    // Optional chaining
+    println("--- Optional Chaining Demo ---");
+    let maybe_user: User<string>? = User::create(2, "Jane Smith", "Designer");
+    optional_chaining_demo(maybe_user);
+    
+    // Nullish value
+    let no_user: User<string>? = none;
+    optional_chaining_demo(no_user);
+    println();
+    
+    println("===== Demo Complete =====");
+} 

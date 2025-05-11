@@ -1,0 +1,156 @@
+// Pipeline Operator Example in ShitRust
+// This file demonstrates the pipeline operator for functional programming
+
+fn main() -> void {
+    println("========== Pipeline Operator in ShitRust ==========");
+    
+    // --- Introduction to the Pipeline Operator ---
+    println("\n--- Introduction to the Pipeline Operator ---");
+    
+    // Traditional way of writing nested function calls
+    let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    println("Original numbers: " + numbers.to_string());
+    
+    // Without pipeline: Nested function calls from inside to outside
+    let result1 = sum(filter(map(numbers, double), is_even));
+    println("Result without pipeline: " + result1.to_string());
+    
+    // With pipeline: Operations from left to right
+    let result2 = numbers 
+        |> map(_, double) 
+        |> filter(_, is_even) 
+        |> sum(_);
+    println("Result with pipeline: " + result2.to_string());
+    
+    // --- More Pipeline Examples ---
+    println("\n--- More Pipeline Examples ---");
+    
+    // Example 1: Text processing
+    let text = "Hello, World! This is ShitRust.";
+    
+    let word_count = text
+        |> to_lowercase(_)
+        |> replace(_, ",", "")
+        |> replace(_, "!", "")
+        |> replace(_, ".", "")
+        |> split(_, " ")
+        |> _.length();
+        
+    println("Word count in text: " + word_count.to_string());
+    
+    // Example 2: Mathematical operations
+    let math_result = 5
+        |> add(_, 10)      // 5 + 10 = 15
+        |> multiply(_, 2)  // 15 * 2 = 30
+        |> subtract(_, 5)  // 30 - 5 = 25
+        |> divide(_, 5);   // 25 / 5 = 5
+        
+    println("Math result: " + math_result.to_string());
+    
+    // Example 3: Array transformations
+    let names = ["Alice", "Bob", "Charlie", "David", "Eve"];
+    
+    let formatted_names = names
+        |> filter(_, |name| -> bool { return name.length() > 3; })
+        |> map(_, |name| -> string { return name.to_uppercase(); })
+        |> join(_, ", ");
+        
+    println("Formatted names: " + formatted_names);
+    
+    // Example 4: Using list comprehensions in pipeline
+    let squares = [1, 2, 3, 4, 5]
+        |> [x * x for x in _]
+        |> filter(_, |x| -> bool { return x > 10; })
+        |> _.to_string();
+        
+    println("Filtered squares: " + squares);
+    
+    // Example 5: Object transformation
+    let users = [
+        { "name": "Alice", "age": 30, "active": true },
+        { "name": "Bob", "age": 25, "active": false },
+        { "name": "Charlie", "age": 35, "active": true },
+        { "name": "David", "age": 28, "active": true }
+    ];
+    
+    let active_user_names = users
+        |> filter(_, |user| -> bool { return user.active; })
+        |> map(_, |user| -> string { return user.name; })
+        |> join(_, ", ");
+        
+    println("Active users: " + active_user_names);
+    
+    println("\n========== Pipeline Example Complete ==========");
+}
+
+// Helper functions for the examples
+
+fn double(x: int) -> int {
+    return x * 2;
+}
+
+fn is_even(x: int) -> bool {
+    return x % 2 == 0;
+}
+
+fn sum(arr: [int]) -> int {
+    let total = 0;
+    for num in arr {
+        total = total + num;
+    }
+    return total;
+}
+
+fn map(arr: [T], func: fn(T) -> U) -> [U] {
+    let result = [];
+    for item in arr {
+        result.push(func(item));
+    }
+    return result;
+}
+
+fn filter(arr: [T], predicate: fn(T) -> bool) -> [T] {
+    let result = [];
+    for item in arr {
+        if predicate(item) {
+            result.push(item);
+        }
+    }
+    return result;
+}
+
+fn to_lowercase(text: string) -> string {
+    // In a real implementation, this would convert to lowercase
+    return text.to_lowercase();
+}
+
+fn replace(text: string, pattern: string, replacement: string) -> string {
+    // In a real implementation, this would replace all occurrences
+    return text.replace(pattern, replacement);
+}
+
+fn split(text: string, delimiter: string) -> [string] {
+    // In a real implementation, this would split the string
+    return text.split(delimiter);
+}
+
+fn add(a: int, b: int) -> int {
+    return a + b;
+}
+
+fn subtract(a: int, b: int) -> int {
+    return a - b;
+}
+
+fn multiply(a: int, b: int) -> int {
+    return a * b;
+}
+
+fn divide(a: int, b: int) -> int {
+    return a / b;
+}
+
+fn join(arr: [string], delimiter: string) -> string {
+    // In a real implementation, this would join the strings
+    return arr.join(delimiter);
+} 

@@ -1,0 +1,229 @@
+// ShitRust Async Programming Example
+// This example demonstrates the new async/await functionality and error handling
+
+// Import the standard library
+use std.time;
+use std.io;
+use std.net;
+
+// Define a Result type for our operations
+struct ApiResponse {
+    status: int,
+    data: string,
+    error: string?,
+    
+    // Success factory method
+    static fn success(data: string) -> ApiResponse {
+        return ApiResponse {
+            status: 200,
+            data: data,
+            error: none,
+        };
+    }
+    
+    // Error factory method
+    static fn error(status: int, message: string) -> ApiResponse {
+        return ApiResponse {
+            status: status,
+            data: "",
+            error: message,
+        };
+    }
+    
+    // Method to check if the response is successful
+    fn is_success() -> bool {
+        return this.status >= 200 && this.status < 300;
+    }
+}
+
+// Simulate an API call with a delay
+async fn fetch_data(url: string, delay_ms: int = 1000) -> result<ApiResponse, string> {
+    // Simulate network delay
+    await time.sleep(delay_ms);
+    
+    // Simulate a response based on the URL
+    if url.contains("success") {
+        return ok(ApiResponse::success("Data from " + url));
+    } else if url.contains("timeout") {
+        return err("Request timed out");
+    } else if url.contains("error") {
+        return err("Server error");
+    } else {
+        return ok(ApiResponse::success("Generic data for " + url));
+    }
+}
+
+// Process data with multiple async operations
+async fn process_data(urls: [string]) -> void {
+    println("Starting to process " + urls.length().to_string() + " URLs");
+    
+    // Process sequentially
+    println("\n--- Sequential Processing ---");
+    let start_time = time.now();
+    
+    for url in urls {
+        println("Fetching " + url);
+        try {
+            let result = await fetch_data(url);
+            match result {
+                ok(response) => {
+                    if response.is_success() {
+                        println("Success: " + response.data);
+                    } else {
+                        println("API Error: " + response.error ?? "Unknown error");
+                    }
+                },
+                err(error) => {
+                    println("Error: " + error);
+                }
+            }
+        } catch e {
+            println("Exception: " + e.to_string());
+        }
+    }
+    
+    let end_time = time.now();
+    println("Sequential processing completed in " + (end_time - start_time).to_string() + "ms");
+    
+    // Process concurrently (if supported)
+    println("\n--- Concurrent Processing ---");
+    let start_time2 = time.now();
+    
+    // Create a list to hold all futures
+    let futures = [];
+    
+    // Start all requests concurrently
+    for url in urls {
+        futures.push(fetch_data(url));
+    }
+    
+    // Wait for all futures to complete
+    for i in 0..futures.length() {
+        try {
+            let url = urls[i];
+            println("Processing result for " + url);
+            
+            let result = await futures[i];
+            match result {
+                ok(response) => {
+                    if response.is_success() {
+                        println("Success: " + response.data);
+                    } else {
+                        println("API Error: " + response.error ?? "Unknown error");
+                    }
+                },
+                err(error) => {
+                    println("Error: " + error);
+                }
+            }
+        } catch e {
+            println("Exception: " + e.to_string());
+        }
+    }
+    
+    let end_time2 = time.now();
+    println("Concurrent processing completed in " + (end_time2 - start_time2).to_string() + "ms");
+}
+
+// Timeout utility function
+async fn with_timeout<T>(future: future<T>, timeout_ms: int) -> result<T, string> {
+    // Create a timer
+    let timer = time.Timer::create();
+    timer.start();
+    
+    loop {
+        // Check if future is ready
+        if future.is_ready() {
+            return ok(await future);
+        }
+        
+        // Check if we've timed out
+        if timer.elapsed() > timeout_ms {
+            return err("Operation timed out after " + timeout_ms.to_string() + "ms");
+        }
+        
+        // Yield to allow other tasks to run
+        await time.sleep(10);
+    }
+}
+
+// Combine multiple results
+async fn fetch_all(urls: [string]) -> [result<ApiResponse, string>] {
+    let results = [];
+    
+    for url in urls {
+        let result = await fetch_data(url);
+        results.push(result);
+    }
+    
+    return results;
+}
+
+// Retry an operation
+async fn fetch_with_retry(url: string, max_retries: int = 3) -> result<ApiResponse, string> {
+    let retries = 0;
+    
+    while retries < max_retries {
+        let result = await fetch_data(url);
+        
+        match result {
+            ok(response) => return ok(response),
+            err(error) => {
+                retries = retries + 1;
+                println("Retry " + retries.to_string() + "/" + max_retries.to_string() + 
+                       " for " + url + ": " + error);
+                
+                if retries < max_retries {
+                    // Exponential backoff
+                    await time.sleep(100 * (2 ** retries));
+                }
+            }
+        }
+    }
+    
+    return err("Failed after " + max_retries.to_string() + " retries");
+}
+
+// Main function
+fn main() -> void {
+    println("===== ShitRust Async Programming Demo =====\n");
+    
+    // Define URLs to fetch
+    let urls = [
+        "https://example.com/api/success",
+        "https://example.com/api/error",
+        "https://example.com/api/timeout",
+        "https://example.com/api/data"
+    ];
+    
+    // Execute the async function
+    try {
+        println("Starting async operations...");
+        
+        // Use the process_data function
+        process_data(urls);
+        
+        // Example of using with_timeout
+        let future = fetch_data("https://example.com/api/slow", 2000);
+        let result = with_timeout(future, 1000);
+        
+        match result {
+            ok(response) => println("Got response: " + response.data),
+            err(error) => println("Timeout error: " + error)
+        }
+        
+        // Example of retry logic
+        let retry_result = fetch_with_retry("https://example.com/api/flaky");
+        
+        match retry_result {
+            ok(response) => println("Retry succeeded: " + response.data),
+            err(error) => println("Retry failed: " + error)
+        }
+        
+        println("\nAsync demo completed successfully");
+    } catch e {
+        println("Async demo failed with error: " + e.to_string());
+    }
+    
+    println("\n===== Demo Complete =====");
+} 

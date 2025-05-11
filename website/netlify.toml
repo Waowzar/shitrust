@@ -1,0 +1,81 @@
+[build]
+  publish = "./"
+  command = "# No build step needed for pre-built HTML/CSS/JS"
+
+[dev]
+  framework = "#static"
+  port = 8888
+  targetPort = 8888
+  publish = "./"
+  autoLaunch = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self'"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[redirects]]
+  from = "/tutorials"
+  to = "/tutorials.html"
+  status = 301
+
+[[redirects]]
+  from = "/guide"
+  to = "/guide.html"
+  status = 301
+
+[[redirects]]
+  from = "/api"
+  to = "/api.html"
+  status = 301
+
+[[redirects]]
+  from = "/reference"
+  to = "/reference.html"
+  status = 301
+
+[[redirects]]
+  from = "/examples"
+  to = "/examples.html"
+  status = 301
+
+[[redirects]]
+  from = "/about"
+  to = "/about.html"
+  status = 301
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200 

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShitRust Programming Language</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="images/icon.svg" type="image/svg+xml">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Prism.js for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo-container">
+          <img src="images/icon.svg" alt="ShitRust Logo" class="logo">
+          <span class="logo-text">ShitRust</span>
+        </div>
+        
+        <button class="hamburger">
+          <i class="fas fa-bars"></i>
+        </button>
+        
+        <ul class="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#installation">Installation</a></li>
+          <li><a href="#examples">Examples</a></li>
+          <li><a href="#documentation">Documentation</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <img src="images/icon.svg" alt="ShitRust Logo" class="hero-logo">
+      <h1>ShitRust</h1>
+      <p>A programming language combining the best features from Rust, Python, and C/C++</p>
+      <div class="version-tag">Version 0.3.0</div>
+      <div class="hero-buttons">
+        <a href="#installation" class="btn">Get Started</a>
+        <a href="https://github.com/._w0wzers/shitrust" class="btn btn-secondary" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section id="features" class="features">
+    <div class="container">
+      <h2>Features</h2>
+      <p>ShitRust combines the best aspects of modern programming languages to deliver performance, safety, and developer productivity.</p>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3>Memory Safety</h3>
+          <p>Inspired by Rust, ShitRust provides strong memory safety guarantees without the complexity of a garbage collector.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-tachometer-alt"></i>
+          </div>
+          <h3>High Performance</h3>
+          <p>LLVM-based optimizing compiler that generates efficient native code with performance comparable to C/C++.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-code"></i>
+          </div>
+          <h3>Modern Syntax</h3>
+          <p>Clean, Python-inspired syntax that emphasizes readability while maintaining the expressiveness of systems languages.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-pen"></i>
+          </div>
+          <h3>Built-in Formatter</h3>
+          <p>Integrated code formatter ensures consistent style across your codebase, eliminating style debates.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-bolt"></i>
+          </div>
+          <h3>Async Support</h3>
+          <p>First-class async/await syntax provides seamless asynchronous programming without callback hell.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <h3>Error Handling</h3>
+          <p>Combination of Result types and try/catch blocks gives you flexibility in error handling approaches.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-puzzle-piece"></i>
+          </div>
+          <h3>Traits & Interfaces</h3>
+          <p>Powerful trait system allows for composition-based code organization with clear interfaces.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <h3>List Comprehensions</h3>
+          <p>Python-style list comprehensions enable powerful, concise data transformations.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-code-branch"></i>
+          </div>
+          <h3>Pipeline Operator</h3>
+          <p>Functional programming with pipeline operator for clean, readable data transformations.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-check-double"></i>
+          </div>
+          <h3>Optional Chaining</h3>
+          <p>Safely access properties deep in object hierarchies without worrying about null references.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-sitemap"></i>
+          </div>
+          <h3>Pattern Matching</h3>
+          <p>Comprehensive pattern matching with destructuring, guards, and or-patterns for expressive code.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-box"></i>
+          </div>
+          <h3>Generics</h3>
+          <p>First-class generic types and functions for type-safe, reusable code components.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-cubes"></i>
+          </div>
+          <h3>Module System</h3>
+          <p>Robust module system with explicit imports and exports for better code organization.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-network-wired"></i>
+          </div>
+          <h3>Concurrency</h3>
+          <p>Built-in concurrency primitives make parallel programming straightforward and safe.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-plug"></i>
+          </div>
+          <h3>Foreign Function Interface</h3>
+          <p>Seamless interoperability with C/C++ libraries through a simple and safe FFI.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-vial"></i>
+          </div>
+          <h3>Built-in Testing</h3>
+          <p>Integrated testing framework makes writing and running tests frictionless.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-clipboard-check"></i>
+          </div>
+          <h3>Static Analysis</h3>
+          <p>Advanced static analysis catches bugs and ensures code quality before runtime.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-archive"></i>
+          </div>
+          <h3>Package Management</h3>
+          <p>Integrated package manager simplifies dependency management and sharing code.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Installation Section -->
+  <section id="installation" class="installation">
+    <div class="container">
+      <h2>Installation</h2>
+      <p>Getting started with ShitRust is easy. Follow these steps to install the compiler on your system:</p>
+      
+      <div class="tabs">
+        <div class="tab-header">
+          <button class="tab-btn active" data-target="tab-linux">Linux/macOS</button>
+          <button class="tab-btn" data-target="tab-windows">Windows</button>
+        </div>
+        
+        <div id="tab-linux" class="tab-content active">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">bash</span>
+              <button class="copy-btn"><i class="far fa-copy"></i></button>
+            </div>
+            <pre><code class="language-bash"># Clone the repository
+git clone https://github.com/._w0wzers/shitrust.git
+cd shitrust
+
+# Build the compiler
+./build.sh
+
+# Install the binary (optional)
+cargo install --path .
+
+# Show help
+shitrust --help</code></pre>
+          </div>
+        </div>
+        
+        <div id="tab-windows" class="tab-content">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">batch</span>
+              <button class="copy-btn"><i class="far fa-copy"></i></button>
+            </div>
+            <pre><code class="language-batch"># Clone the repository
+git clone https://github.com/._w0wzers/shitrust.git
+cd shitrust
+
+# Build the compiler
+build.bat
+
+# Install the binary (optional)
+cargo install --path .
+
+# Show help
+shitrust --help</code></pre>
+          </div>
+        </div>
+      </div>
+      
+      <h3>Build Script Options</h3>
+      <p>The project includes build scripts for both Windows and Unix platforms with various options:</p>
+      
+      <div class="tabs">
+        <div class="tab-header">
+          <button class="tab-btn active" data-target="tab-build-linux">Linux/macOS</button>
+          <button class="tab-btn" data-target="tab-build-windows">Windows</button>
+        </div>
+        
+        <div id="tab-build-linux" class="tab-content active">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">bash</span>
+              <button class="copy-btn"><i class="far fa-copy"></i></button>
+            </div>
+            <pre><code class="language-bash"># Show help
+./build.sh help
+
+# Build debug version
+./build.sh
+
+# Build release version
+./build.sh release
+
+# Clean build artifacts
+./build.sh clean
+
+# Run tests
+./build.sh test
+
+# Run examples
+./build.sh examples
+
+# Run benchmark with timing information
+./build.sh bench
+
+# Generate documentation
+./build.sh docs</code></pre>
+          </div>
+        </div>
+        
+        <div id="tab-build-windows" class="tab-content">
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">batch</span>
+              <button class="copy-btn"><i class="far fa-copy"></i></button>
+            </div>
+            <pre><code class="language-batch"># Show help
+build.bat help
+
+# Build debug version
+build.bat
+
+# Build release version
+build.bat release
+
+# Clean build artifacts
+build.bat clean
+
+# Run tests
+build.bat test
+
+# Run examples
+build.bat examples
+
+# Run benchmark with timing information
+build.bat bench
+
+# Generate documentation
+build.bat docs</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Examples Section -->
+  <section id="examples" class="code-section">
+    <div class="container">
+      <h2>Examples</h2>
+      <p>ShitRust's syntax is designed to be familiar to developers coming from Rust, Python, or C/C++. Here are some examples to help you get started:</p>
+      
+      <h3>Hello World</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">rust</span>
+          <button class="copy-btn"><i class="far fa-copy"></i></button>
+        </div>
+        <pre><code class="language-rust">// Hello World in ShitRust - A simple example
+
+// Function to generate a greeting
+fn generate_greeting(name: string) -> string {
+    let greeting = "Hello, " + name + "!";
+    return greeting;
+}
+
+// Main function - entry point of the program
+fn main() -> void {
+    // Basic println
+    println("Hello, ShitRust World!");
+    
+    // Variables with type inference
+    let name = "ShitRust";
+    let version = 0.2;
+    
+    // String concatenation and method calls
+    println("Welcome to " + name + " version " + version.to_string() + "!");
+    
+    // Conditional statement
+    if (version < 1.0) {
+        println("This is an early preview version.");
+    } else {
+        println("This is a stable release.");
+    }
+    
+    // Function call
+    let message = generate_greeting("Programmer");
+    println(message);
+}</code></pre>
+      </div>
+      
+      <h3>Basic Syntax</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">rust</span>
+          <button class="copy-btn"><i class="far fa-copy"></i></button>
+        </div>
+        <pre><code class="language-rust">// Function definition
+fn add(a: int, b: int) -> int {
+    return a + b;
+}
+
+// Variables
+let x = 5;          // Type inference
+let mut y = 10;     // Mutable variable
+let z: float = 3.14; // With type annotation
+
+// Constants
+const PI: float = 3.14159;
+const MAX_SIZE: int = 100;
+
+// Control flow
+if x > y {
+    println("x is greater");
+} else {
+    println("y is greater");
+}
+
+// Loops
+while x > 0 {
+    x = x - 1;
+}
+
+for i in 0..10 {
+    println(i.to_string());
+}
+
+// Infinite loop with break
+loop {
+    if x > 10 {
+        break;
+    }
+    x = x + 1;
+}
+
+// Match statement
+match x {
+    0 => println("Zero"),
+    1 => println("One"),
+    n if n < 10 => println("Single digit"),
+    _ => println("Other"),
+}</code></pre>
+      </div>
+      
+      <h3>Advanced Features</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">rust</span>
+          <button class="copy-btn"><i class="far fa-copy"></i></button>
+        </div>
+        <pre><code class="language-rust">// Type aliases
+type UserId = int;
+type UserMap<T> = HashMap<UserId, T>;
+
+// Generic struct
+struct Point<T> {
+    x: T,
+    y: T,
+    
+    fn distance_from_origin() -> float {
+        return (this.x.to_float() * this.x.to_float() + 
+                this.y.to_float() * this.y.to_float()).sqrt();
+    }
+    
+    // Static method
+    static fn origin() -> Point<T> {
+        return Point { x: T.from(0), y: T.from(0) };
+    }
+}
+
+// Trait definition
+trait Printable {
+    fn print() -> void;
+    fn debug_print() -> string;
+}
+
+// Implementing a trait
+impl Printable for Point<float> {
+    fn print() -> void {
+        println("Point(" + this.x.to_string() + ", " + this.y.to_string() + ")");
+    }
+    
+    fn debug_print() -> string {
+        return "Point { x: " + this.x.to_string() + ", y: " + this.y.to_string() + " }";
+    }
+}
+
+// Result enum for error handling
+enum Result<T, E> {
+    Ok(T),
+    Err(E)
+}
+
+// Function returning a Result
+fn divide(a: int, b: int) -> Result<int, string> {
+    if b == 0 {
+        return Result::Err("Division by zero");
+    }
+    return Result::Ok(a / b);
+}
+
+// Async function with await
+async fn fetch_data(url: string) -> Result<string, string> {
+    // Async code here
+    await timing.sleep(1000);
+    return Result::Ok("Data from " + url);
+}
+
+// Using async/await with error handling
+fn process_data() -> void {
+    try {
+        let result = await fetch_data("https://api.example.com");
+        match result {
+            Result::Ok(data) => println("Success: " + data),
+            Result::Err(err) => println("Error: " + err)
+        }
+    } catch e {
+        println("Exception: " + e.to_string());
+    }
+}
+
+// List comprehension
+let numbers = [1, 2, 3, 4, 5];
+let squares = [x * x for x in numbers if x % 2 == 0];
+
+// Pipeline operator
+let result = numbers 
+    |> [x * 2 for x in _]
+    |> _.filter(|x| -> bool { return x > 5; })
+    |> _.sum();
+
+// Optional chaining and nullish coalescing
+let user = get_user(123);
+let username = user?.name ?? "Unknown";
+let isActive = user?.is_active() ?? false;</code></pre>
+      </div>
+      
+      <div class="examples-cta">
+        <h3>More Examples</h3>
+        <p>Check out our full collection of examples to explore all of ShitRust's features:</p>
+        <a href="examples.html" class="btn">View More Examples</a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Documentation Section -->
+  <section id="documentation" class="documentation">
+    <div class="container">
+      <h2>Documentation</h2>
+      <p>Comprehensive documentation is available to help you learn and use ShitRust effectively.</p>
+      
+      <div class="docs-grid">
+        <div class="doc-card">
+          <h3>Getting Started</h3>
+          <p>New to ShitRust? Start here to learn the basics and get your first program running.</p>
+          <a href="guide.html" class="btn">Read Guide</a>
+        </div>
+        
+        <div class="doc-card">
+          <h3>Language Reference</h3>
+          <p>Detailed documentation of ShitRust's syntax, types, functions, and standard library.</p>
+          <a href="reference.html" class="btn">Explore Reference</a>
+        </div>
+        
+        <div class="doc-card">
+          <h3>API Documentation</h3>
+          <p>Complete API reference for the ShitRust standard library and core modules.</p>
+          <a href="api.html" class="btn">View API Docs</a>
+        </div>
+        
+        <div class="doc-card">
+          <h3>Tutorials</h3>
+          <p>Step-by-step tutorials to build real applications with ShitRust.</p>
+          <a href="tutorials.html" class="btn">Start Learning</a>
+        </div>
+      </div>
+      
+      <div class="docs-cta">
+        <h3>Generate Local Documentation</h3>
+        <p>You can also generate comprehensive documentation locally using the build scripts:</p>
+        
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="copy-btn"><i class="far fa-copy"></i></button>
+          </div>
+          <pre><code class="language-bash"># Windows
+build.bat docs
+
+# Linux/macOS
+./build.sh docs
+
+# Documentation will be available at:
+# target/doc/shitrust/index.html</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Community Section -->
+  <section id="community" class="community">
+    <div class="container">
+      <h2>About the Project</h2>
+      <p>ShitRust is currently developed by a solo developer. Feel free to check out the GitHub repository for the latest updates.</p>
+      
+      <div class="social-links">
+        <a href="https://github.com/._w0wzers" class="social-link" title="GitHub">
+          <i class="fab fa-github"></i>
+        </a>
+      </div>
+      
+      <div class="community-cta">
+        <h3>Contributing</h3>
+        <p>ShitRust is an open-source project, and contributions are always welcome! Check out the contribution guidelines to get started:</p>
+        
+        <ol>
+          <li>Fork the repository</li>
+          <li>Create your feature branch: <code>git checkout -b feature/amazing-feature</code></li>
+          <li>Commit your changes: <code>git commit -m 'Add some amazing feature'</code></li>
+          <li>Push to the branch: <code>git push origin feature/amazing-feature</code></li>
+          <li>Open a Pull Request</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>ShitRust</h3>
+          <p>A programming language combining features from Rust, Python, and C/C++.</p>
+          <p>Released under the <a href="#">MIT License</a>.</p>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#examples">Examples</a></li>
+            <li><a href="#documentation">Documentation</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Documentation</h3>
+          <ul class="footer-links">
+            <li><a href="guide.html">Guide</a></li>
+            <li><a href="reference.html">Reference</a></li>
+            <li><a href="api.html">API</a></li>
+            <li><a href="tutorials.html">Tutorials</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Developer</h3>
+          <ul class="footer-links">
+            <li><a href="https://github.com/._w0wzers">._w0wzers</a></li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2023 ShitRust Language. Developed by ._w0wzers. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-batch.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html> 

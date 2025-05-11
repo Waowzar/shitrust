@@ -1,0 +1,164 @@
+// Advanced ShitRust language features demonstration
+
+// Import statement
+import { Vector, HashMap } from "std/collections";
+import { read_file } from "std/io";
+
+// Enum definition with generic parameters
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+// Structure for storing a point in 2D space
+struct Point {
+    x: float,
+    y: float,
+    
+    // Methods on structures
+    fn distance_from_origin() -> float {
+        return (self.x * self.x + self.y * self.y).sqrt();
+    }
+    
+    fn distance_to(other: Point) -> float {
+        let dx = self.x - other.x;
+        let dy = self.y - other.y;
+        return (dx * dx + dy * dy).sqrt();
+    }
+}
+
+// Generic function with constraints
+fn max<T>(a: T, b: T) -> T where T: CanCompare {
+    if (a > b) {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+// Function that returns a Result
+fn parse_int(s: string) -> Result<int, string> {
+    // In a real implementation, this would parse the string
+    if (s.length() == 0) {
+        return Result::Err("Empty string");
+    }
+    
+    let is_numeric = true;
+    for (c in s.chars()) {
+        if (c < '0' || c > '9') {
+            is_numeric = false;
+            break;
+        }
+    }
+    
+    if (!is_numeric) {
+        return Result::Err("Not a valid integer");
+    }
+    
+    // Simplified conversion - in reality we'd parse the digits
+    let value = 0;
+    for (c in s.chars()) {
+        value = value * 10 + (c - '0');
+    }
+    
+    return Result::Ok(value);
+}
+
+// Function with pattern matching
+fn describe_point(p: Point) -> string {
+    let message = "";
+    
+    // Pattern matching on struct fields
+    match p {
+        Point { x: 0, y: 0 } => {
+            message = "Point is at the origin";
+        },
+        Point { x: x, y: 0 } => {
+            message = "Point is on the x-axis at x = " + x.to_string();
+        },
+        Point { x: 0, y: y } => {
+            message = "Point is on the y-axis at y = " + y.to_string();
+        },
+        Point { x: x, y: y } if x == y => {
+            message = "Point is on the line y = x";
+        },
+        _ => {
+            message = "Point is at (" + p.x.to_string() + ", " + p.y.to_string() + ")";
+        },
+    }
+    
+    return message;
+}
+
+// Main function
+fn main() -> void {
+    println("Advanced ShitRust Features Demo");
+    
+    // 1. Working with enums and pattern matching
+    let result = parse_int("123");
+    
+    match result {
+        Result::Ok(value) => {
+            println("Successfully parsed: " + value.to_string());
+        },
+        Result::Err(error) => {
+            println("Error parsing: " + error);
+        },
+    }
+    
+    // 2. Creating and using structs
+    let origin = Point { x: 0.0, y: 0.0 };
+    let p1 = Point { x: 3.0, y: 4.0 };
+    
+    println("Distance from origin: " + p1.distance_from_origin().to_string());
+    println("Description: " + describe_point(p1));
+    
+    // 3. Higher order functions and lambdas
+    let numbers = [1, 2, 3, 4, 5];
+    
+    // Map operation (simplified for our compiler)
+    let squares = [];
+    for (num in numbers) {
+        squares.push(num * num);
+    }
+    
+    println("Original: " + numbers.to_string());
+    println("Squares: " + squares.to_string());
+    
+    // 4. Error handling with the ? operator
+    fn read_file_safe(filename: string) -> string {
+        let result = read_file(filename);
+        match result {
+            Result::Ok(content) => {
+                return content;
+            },
+            Result::Err(error) => {
+                println("Warning: " + error);
+                return "";
+            },
+        }
+    }
+    
+    // 5. Generic functions
+    let max_num = max(10, 20);
+    println("Max of 10 and 20: " + max_num.to_string());
+    
+    // 6. Memory management with ownership (simplified)
+    let v1 = [1, 2, 3];
+    let v2 = v1.clone(); // Deep copy v1
+    v1.push(4);          // Modify v1
+    
+    println("v1: " + v1.to_string());
+    println("v2: " + v2.to_string()); // v2 is unchanged
+    
+    println("Advanced demo completed!");
+}
+
+// Helper function (would be in standard library)
+fn read_file(filename: string) -> Result<string, string> {
+    if (filename == "test.txt") {
+        return Result::Ok("This is test.txt content");
+    } else {
+        return Result::Err("File not found: " + filename);
+    }
+}

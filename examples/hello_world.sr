@@ -1,0 +1,109 @@
+// ShitRust Hello World with standard features
+// This example demonstrates the basic syntax and features of ShitRust
+
+// Import standard library components
+import { Vector, HashMap } from "std/collections";
+import { File, Path } from "std/io";
+
+// A simple function that returns a greeting
+fn create_greeting(name: string) -> string {
+    return "Hello, " + name + "!";
+}
+
+// Function to demonstrate control flow
+fn check_number(value: int) -> string {
+    if (value > 0) {
+        return "positive";
+    } else if (value < 0) {
+        return "negative";
+    } else {
+        return "zero";
+    }
+}
+
+// Function showing multiple return points
+fn abs(x: int) -> int {
+    if (x < 0) {
+        return -x;
+    }
+    return x;  // No need for else here
+}
+
+// Main function - program entry point
+fn main() -> void {
+    // Simple output
+    println("Hello, World from ShitRust!");
+    
+    // Variable declarations
+    let name = "Programmer";  // Type inference
+    let age: int = 25;        // With type annotation
+    let mut counter = 0;      // Mutable variable
+    
+    // Using variables in expressions
+    println(create_greeting(name));
+    println("Age: " + age.to_string() + " years");
+    
+    // Arithmetic operations
+    let sum = 10 + 5;
+    let product = 7 * 3;
+    let quotient = 20 / 4;
+    println("Sum: " + sum.to_string());
+    println("Product: " + product.to_string());
+    println("Quotient: " + quotient.to_string());
+    
+    // Boolean logic
+    let is_adult = age >= 18;
+    if (is_adult) {
+        println("User is an adult");
+    }
+    
+    // Control flow - if/else
+    let number = -42;
+    println("The number " + number.to_string() + " is " + check_number(number));
+    println("Absolute value: " + abs(number).to_string());
+    
+    // Loop with while
+    while (counter < 3) {
+        println("Counter: " + counter.to_string());
+        counter = counter + 1;
+    }
+    
+    // Collections and for loop
+    let numbers = [1, 2, 3, 4, 5];
+    let mut total = 0;
+    
+    println("Iterating through numbers:");
+    for (num in numbers) {
+        println("- " + num.to_string());
+        total = total + num;
+    }
+    println("Total: " + total.to_string());
+    
+    // String operations
+    let greeting = "Hello";
+    let world = "World";
+    let message = greeting + ", " + world + "!";
+    println(message);
+    
+    // Using methods
+    let uppercase_message = message.to_uppercase();
+    println(uppercase_message);
+    
+    println("Goodbye from ShitRust!");
+}
+
+// Function definition
+fn calculate_sum(a: int, b: int) -> int {
+    return a + b;
+}
+
+// Struct definition
+struct Point {
+    x: float,
+    y: float,
+    
+    // Method definition
+    fn distance_from_origin() -> float {
+        return (self.x * self.x + self.y * self.y).sqrt();
+    }
+}

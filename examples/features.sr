@@ -1,0 +1,142 @@
+// ShitRust Advanced Features Demo
+// This example demonstrates the new features of ShitRust
+
+// Async function example
+async fn fetch_data(url: string) -> string {
+    println("Fetching data from: " + url);
+    // Simulate network delay
+    for i in 0..3 {
+        println("Waiting... " + i.to_string());
+    }
+    return "Data from " + url;
+}
+
+// Function with error handling
+fn divide(a: int, b: int) -> result<int, string> {
+    if b == 0 {
+        return err("Division by zero");
+    }
+    return ok(a / b);
+}
+
+// Struct with methods
+struct Point {
+    x: float,
+    y: float,
+    
+    // Method with 'this' keyword to access fields
+    fn distance_from_origin() -> float {
+        return (this.x * this.x + this.y * this.y).sqrt();
+    }
+    
+    // Static method
+    static fn origin() -> Point {
+        return Point { x: 0.0, y: 0.0 };
+    }
+}
+
+// Public enum with variants
+pub enum Shape {
+    Circle(float),  // radius
+    Rectangle(float, float),  // width, height
+    Triangle(float, float, float),  // sides
+}
+
+// Pattern matching function
+fn area(shape: Shape) -> float {
+    match shape {
+        Shape::Circle(radius) => {
+            return 3.14159 * radius * radius;
+        },
+        Shape::Rectangle(width, height) => {
+            return width * height;
+        },
+        Shape::Triangle(a, b, c) => {
+            // Heron's formula
+            let s = (a + b + c) / 2.0;
+            return (s * (s - a) * (s - b) * (s - c)).sqrt();
+        }
+    }
+}
+
+// Main function using all features
+fn main() -> void {
+    println("===== ShitRust Advanced Features Demo =====");
+    
+    // Async/await
+    println("\n--- Async/Await Example ---");
+    let future_data = fetch_data("https://example.com");
+    println("Future created but not awaited yet");
+    let data = await future_data;
+    println("Data received: " + data);
+    
+    // Error handling with try
+    println("\n--- Error Handling Example ---");
+    try {
+        let result = divide(10, 2);
+        match result {
+            ok(value) => println("Result: " + value.to_string()),
+            err(message) => println("Error: " + message)
+        }
+        
+        let error_result = divide(10, 0);
+        match error_result {
+            ok(value) => println("Result: " + value.to_string()),
+            err(message) => println("Error: " + message)
+        }
+    } catch e {
+        println("Caught exception: " + e.to_string());
+    }
+    
+    // Struct and methods
+    println("\n--- Struct and Methods Example ---");
+    let point = Point { x: 3.0, y: 4.0 };
+    println("Point: (" + point.x.to_string() + ", " + point.y.to_string() + ")");
+    println("Distance from origin: " + point.distance_from_origin().to_string());
+    
+    let origin = Point::origin();
+    println("Origin: (" + origin.x.to_string() + ", " + origin.y.to_string() + ")");
+    
+    // Enum and pattern matching
+    println("\n--- Enum and Pattern Matching Example ---");
+    let shapes = [
+        Shape::Circle(2.0),
+        Shape::Rectangle(3.0, 4.0),
+        Shape::Triangle(3.0, 4.0, 5.0)
+    ];
+    
+    println("Areas:");
+    for shape in shapes {
+        let shape_name = match shape {
+            Shape::Circle(_) => "Circle",
+            Shape::Rectangle(_, _) => "Rectangle",
+            Shape::Triangle(_, _, _) => "Triangle"
+        };
+        println(shape_name + ": " + area(shape).to_string());
+    }
+    
+    // Range expressions
+    println("\n--- Range Example ---");
+    println("Range with inclusive end:");
+    for i in 1..=5 {
+        println(i.to_string());
+    }
+    
+    println("Range with exclusive end:");
+    for i in 1..5 {
+        println(i.to_string());
+    }
+    
+    // Lambda functions
+    println("\n--- Lambda Example ---");
+    let double = |x: int| -> int { return x * 2; };
+    println("Double of 5: " + double(5).to_string());
+    
+    // List comprehension
+    println("\n--- List Comprehension Example ---");
+    let numbers = [1, 2, 3, 4, 5];
+    let squares = [x * x for x in numbers if x % 2 == 0];
+    println("Squares of even numbers: " + squares.to_string());
+    
+    println("\n===== Demo Complete =====");
+} 

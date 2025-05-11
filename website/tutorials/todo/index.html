@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShitRust - Todo List Manager Tutorial</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="../../images/icon.svg" type="image/svg+xml">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../css/style.css">
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Prism.js for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo-container">
+          <img src="../../images/icon.svg" alt="ShitRust Logo" class="logo">
+          <span class="logo-text">ShitRust</span>
+        </div>
+        
+        <button class="hamburger">
+          <i class="fas fa-bars"></i>
+        </button>
+        
+        <ul class="nav-links">
+          <li><a href="../../index.html#features">Features</a></li>
+          <li><a href="../../index.html#installation">Installation</a></li>
+          <li><a href="../../index.html#examples">Examples</a></li>
+          <li><a href="../../index.html#documentation">Documentation</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+  <!-- Tutorial Content -->
+  <section class="documentation-content">
+    <div class="container">
+      <div class="documentation-header">
+        <h1>Creating a Todo List Manager</h1>
+        <p>Learn how to build a full-featured task manager with persistent storage using ShitRust.</p>
+      </div>
+
+      <div class="doc-nav">
+        <ul>
+          <li><a href="#introduction">Introduction</a></li>
+          <li><a href="#task-struct">Task Structure</a></li>
+          <li><a href="#task-manager">Task Manager</a></li>
+          <li><a href="#user-interface">User Interface</a></li>
+          <li><a href="#file-operations">File Operations</a></li>
+          <li><a href="#main-program">Main Program</a></li>
+          <li><a href="#complete-code">Complete Code</a></li>
+          <li><a href="#running">Running the Program</a></li>
+          <li><a href="#extensions">Extensions</a></li>
+        </ul>
+      </div>
+      
+      <div class="doc-content">
+        <section id="introduction">
+          <h2>Introduction</h2>
+          <p>In this tutorial, we'll build a console-based todo list manager that allows you to:</p>
+          
+          <ul>
+            <li>Add, remove, and complete tasks</li>
+            <li>List all, pending, or completed tasks</li>
+            <li>Save tasks to a JSON file and load them later</li>
+          </ul>
+          
+          <p>This project will demonstrate several important ShitRust features:</p>
+          
+          <ul>
+            <li>Defining and using custom structs with methods</li>
+            <li>Working with collections (Vector)</li>
+            <li>File I/O operations</li>
+            <li>JSON serialization and deserialization</li>
+            <li>Error handling with the <code>result</code> type</li>
+            <li>Control flow with <code>match</code> expressions</li>
+          </ul>
+          
+          <p>By the end of this tutorial, you'll have a fully functional task management application that persists data between sessions.</p>
+        </section>
+        
+        <section id="task-struct">
+          <h2>Task Structure</h2>
+          <p>First, let's import the required modules and define a <code>Task</code> struct to represent a todo item.</p>
+          
+          <pre><code class="language-rust">// Import required modules
+import { stdin, stdout, File, Path } from "std/io";
+import { Vector } from "std/collections";
+import { DateTime } from "std/time";
+import { JsonValue, parse_json, to_json } from "std/json";
+
+// Define a Task struct to represent a todo item
+struct Task {
+    id: int,
+    description: string,
+    completed: bool,
+    due_date: string,  // ISO date format (YYYY-MM-DD)
+    
+    // Create a new task with the given description and due date
+    static fn new(id: int, description: string, due_date: string) -> Task {
+        return Task {
+            id: id,
+            description: description,
+            completed: false,
+            due_date: due_date
+        };
+    }
+    
+    // Mark the task as completed
+    fn complete() -> void {
+        self.completed = true;
+    }
+    
+    // Convert the task to a string representation
+    fn to_string() -> string {
+        let status = if self.completed { "[x]" } else { "[ ]" };
+        return self.id.to_string() + ". " + status + " " + self.description + 
+               " (Due: " + self.due_date + ")";
+    }
+}</code></pre>
+          
+          <p>The <code>Task</code> struct has four fields:</p>
+          <ul>
+            <li><code>id</code>: A unique identifier for the task</li>
+            <li><code>description</code>: The task description</li>
+            <li><code>completed</code>: A boolean flag indicating whether the task is done</li>
+            <li><code>due_date</code>: The date by which the task should be completed</li>
+          </ul>
+          
+          <p>We've also defined three methods:</p>
+          <ul>
+            <li><code>new</code>: A static method (constructor) to create a new task</li>
+            <li><code>complete</code>: A method to mark the task as completed</li>
+            <li><code>to_string</code>: A method to convert the task to a string representation</li>
+          </ul>
+        </section>
+        
+        <section id="json-serialization">
+          <h2>JSON Serialization</h2>
+          <p>To save and load tasks, we need to convert them to and from JSON format. Let's add these methods to our <code>Task</code> struct:</p>
+          
+          <pre><code class="language-rust">// Convert task to JSON
+fn to_json() -> JsonValue {
+    let mut map = HashMap<string, JsonValue>::new();
+    map.insert("id", JsonValue::Number(self.id));
+    map.insert("description", JsonValue::String(self.description));
+    map.insert("completed", JsonValue::Boolean(self.completed));
+    map.insert("due_date", JsonValue::String(self.due_date));
+    return JsonValue::Object(map);
+}
+
+// Create a task from JSON
+static fn from_json(json: JsonValue) -> result<Task, string> {
+    if !json.is_object() {
+        return err("JSON value is not an object");
+    }
+    
+    let obj = json.as_object();
+    
+    if !obj.contains_key("id") || !obj["id"].is_number() {
+        return err("Missing or invalid 'id' field");
+    }
+    
+    if !obj.contains_key("description") || !obj["description"].is_string() {
+        return err("Missing or invalid 'description' field");
+    }
+    
+    if !obj.contains_key("completed") || !obj["completed"].is_boolean() {
+        return err("Missing or invalid 'completed' field");
+    }
+    
+    if !obj.contains_key("due_date") || !obj["due_date"].is_string() {
+        return err("Missing or invalid 'due_date' field");
+    }
+    
+    return ok(Task {
+        id: obj["id"].as_number().to_int(),
+        description: obj["description"].as_string(),
+        completed: obj["completed"].as_boolean(),
+        due_date: obj["due_date"].as_string()
+    });
+}</code></pre>
+          
+          <p>These methods allow us to:</p>
+          <ul>
+            <li>Convert a task to a JSON object (<code>to_json</code>)</li>
+            <li>Create a task from a JSON object (<code>from_json</code>), with proper validation</li>
+          </ul>
+        </section>
+        
+        <section id="task-manager">
+          <h2>Task Manager</h2>
+          <p>Next, let's create a <code>TaskManager</code> struct to manage a collection of tasks:</p>
+          
+          <pre><code class="language-rust">// TaskManager to handle the collection of tasks
+struct TaskManager {
+    tasks: Vector<Task>,
+    next_id: int,
+    filename: string,
+    
+    // Create a new task manager with the given filename for storage
+    static fn new(filename: string) -> TaskManager {
+        return TaskManager {
+            tasks: Vector<Task>::new(),
+            next_id: 1,
+            filename: filename
+        };
+    }
+    
+    // Add a new task
+    fn add_task(description: string, due_date: string) -> Task {
+        let task = Task::new(self.next_id, description, due_date);
+        self.tasks.push(task);
+        self.next_id = self.next_id + 1;
+        return task;
+    }
+    
+    // Remove a task by ID
+    fn remove_task(id: int) -> result<void, string> {
+        let index = self.find_task_index(id);
+        
+        if index == -1 {
+            return err("Task with ID " + id.to_string() + " not found");
+        }
+        
+        self.tasks.remove(index);
+        return ok(());
+    }
+    
+    // Mark a task as completed
+    fn complete_task(id: int) -> result<void, string> {
+        let index = self.find_task_index(id);
+        
+        if index == -1 {
+            return err("Task with ID " + id.to_string() + " not found");
+        }
+        
+        self.tasks[index].complete();
+        return ok(());
+    }
+    
+    // Find the index of a task by ID
+    fn find_task_index(id: int) -> int {
+        for i in 0..self.tasks.length() {
+            if self.tasks[i].id == id {
+                return i;
+            }
+        }
+        return -1;
+    }
+}</code></pre>
+          
+          <p>The <code>TaskManager</code> struct handles the collection of tasks and provides methods to:</p>
+          <ul>
+            <li>Add a new task with an automatically assigned ID</li>
+            <li>Remove a task by ID</li>
+            <li>Mark a task as completed</li>
+            <li>Find a task's index by its ID</li>
+          </ul>
+        </section>
+        
+        <section id="task-listing">
+          <h2>Task Listing</h2>
+          <p>Now, let's add methods to list tasks:</p>
+          
+          <pre><code class="language-rust">// List all tasks
+fn list_tasks() -> void {
+    if self.tasks.length() == 0 {
+        println("No tasks found!");
+        return;
+    }
+    
+    println("Tasks:");
+    for task in self.tasks {
+        println(task.to_string());
+    }
+}
+
+// List only completed tasks
+fn list_completed_tasks() -> void {
+    let completed_tasks = self.tasks.filter(|task| -> bool { return task.completed; });
+    
+    if completed_tasks.length() == 0 {
+        println("No completed tasks found!");
+        return;
+    }
+    
+    println("Completed Tasks:");
+    for task in completed_tasks {
+        println(task.to_string());
+    }
+}
+
+// List only pending tasks
+fn list_pending_tasks() -> void {
+    let pending_tasks = self.tasks.filter(|task| -> bool { return !task.completed; });
+    
+    if pending_tasks.length() == 0 {
+        println("No pending tasks found!");
+        return;
+    }
+    
+    println("Pending Tasks:");
+    for task in pending_tasks {
+        println(task.to_string());
+    }
+}</code></pre>
+          
+          <p>These methods allow us to list:</p>
+          <ul>
+            <li>All tasks</li>
+            <li>Only completed tasks</li>
+            <li>Only pending tasks</li>
+          </ul>
+          
+          <p>Note how we use the <code>filter</code> method with lambda functions to filter the tasks based on their <code>completed</code> status.</p>
+        </section>
+        
+        <section id="file-operations">
+          <h2>File Operations</h2>
+          <p>Let's add methods to save and load tasks from a file:</p>
+          
+          <pre><code class="language-rust">// Save tasks to a file
+fn save() -> result<void, string> {
+    let json_tasks = Vector<JsonValue>::new();
+    
+    for task in self.tasks {
+        json_tasks.push(task.to_json());
+    }
+    
+    let json_data = JsonValue::Object(HashMap<string, JsonValue>::from([
+        ("tasks", JsonValue::Array(json_tasks)),
+        ("next_id", JsonValue::Number(self.next_id))
+    ]));
+    
+    let json_str = to_json(json_data);
+    
+    try {
+        let file = File::open(self.filename, "w");
+        file.write(json_str);
+        file.close();
+        return ok(());
+    } catch e {
+        return err("Failed to save tasks: " + e.to_string());
+    }
+}
+
+// Load tasks from a file
+fn load() -> result<void, string> {
+    let path = Path::new(self.filename);
+    
+    if !path.exists() {
+        return ok(());  // File doesn't exist yet, this is fine
+    }
+    
+    try {
+        let file = File::open(self.filename, "r");
+        let content = file.read_to_string();
+        file.close();
+        
+        let json_data = parse_json(content);
+        if !json_data.is_object() {
+            return err("Invalid JSON format in file");
+        }
+        
+        let json_obj = json_data.as_object();
+        
+        if !json_obj.contains_key("tasks") || !json_obj["tasks"].is_array() {
+            return err("Missing or invalid 'tasks' field in JSON");
+        }
+        
+        if !json_obj.contains_key("next_id") || !json_obj["next_id"].is_number() {
+            return err("Missing or invalid 'next_id' field in JSON");
+        }
+        
+        self.next_id = json_obj["next_id"].as_number().to_int();
+        self.tasks.clear();
+        
+        let json_tasks = json_obj["tasks"].as_array();
+        for json_task in json_tasks {
+            let task_result = Task::from_json(json_task);
+            if task_result.is_ok() {
+                self.tasks.push(task_result.unwrap());
+            } else {
+                println("Warning: Skipped invalid task: " + task_result.unwrap_err());
+            }
+        }
+        
+        return ok(());
+    } catch e {
+        return err("Failed to load tasks: " + e.to_string());
+    }
+}</code></pre>
+          
+          <p>These methods:</p>
+          <ul>
+            <li>Save the tasks to a JSON file, including the next ID to use</li>
+            <li>Load tasks from a JSON file, with proper error handling</li>
+          </ul>
+          <p>We use ShitRust's <code>try</code>/<code>catch</code> blocks for exception handling during file operations.</p>
+        </section>
+        
+        <section id="user-interface">
+          <h2>User Interface</h2>
+          <p>Now, let's create functions to display a menu and get today's date:</p>
+          
+          <pre><code class="language-rust">// Function to display the menu
+fn show_menu() -> void {
+    println("\n===== ShitRust Todo List Manager =====");
+    println("1. Add a new task");
+    println("2. List all tasks");
+    println("3. List pending tasks");
+    println("4. List completed tasks");
+    println("5. Mark task as completed");
+    println("6. Remove a task");
+    println("7. Save tasks");
+    println("8. Exit");
+    println("======================================");
+    print("Enter your choice (1-8): ");
+}
+
+// Function to get today's date in YYYY-MM-DD format
+fn get_today() -> string {
+    let today = DateTime::now();
+    return today.format("%Y-%m-%d");
+}</code></pre>
+          
+          <p>The <code>show_menu</code> function displays the application's menu options, and <code>get_today</code> returns today's date in YYYY-MM-DD format for setting default due dates.</p>
+        </section>
+        
+        <section id="main-program">
+          <h2>Main Program</h2>
+          <p>Finally, let's implement the main function to tie everything together:</p>
+          
+          <pre><code class="language-rust">// Main function
+fn main() -> void {
+    let task_manager = TaskManager::new("tasks.json");
+    
+    // Try to load existing tasks
+    let load_result = task_manager.load();
+    if load_result.is_err() {
+        println("Error loading tasks: " + load_result.unwrap_err());
+        println("Starting with an empty task list.");
+    } else {
+        println("Tasks loaded successfully.");
+    }
+    
+    let mut running = true;
+    while (running) {
+        show_menu();
+        let choice = stdin.read_line().trim();
+        
+        match choice {
+            "1" => {
+                print("Enter task description: ");
+                let description = stdin.read_line().trim();
+                
+                print("Enter due date (YYYY-MM-DD) or leave empty for today: ");
+                let due_date_input = stdin.read_line().trim();
+                let due_date = if due_date_input == "" { get_today() } else { due_date_input };
+                
+                let task = task_manager.add_task(description, due_date);
+                println("Task added: " + task.to_string());
+            },
+            "2" => {
+                task_manager.list_tasks();
+            },
+            "3" => {
+                task_manager.list_pending_tasks();
+            },
+            "4" => {
+                task_manager.list_completed_tasks();
+            },
+            "5" => {
+                print("Enter task ID to mark as completed: ");
+                let id_str = stdin.read_line().trim();
+                let id_result = id_str.parse_int();
+                
+                if id_result.is_err() {
+                    println("Invalid ID: " + id_str);
+                    continue;
+                }
+                
+                let complete_result = task_manager.complete_task(id_result.unwrap());
+                if complete_result.is_err() {
+                    println("Error: " + complete_result.unwrap_err());
+                } else {
+                    println("Task marked as completed.");
+                }
+            },
+            "6" => {
+                print("Enter task ID to remove: ");
+                let id_str = stdin.read_line().trim();
+                let id_result = id_str.parse_int();
+                
+                if id_result.is_err() {
+                    println("Invalid ID: " + id_str);
+                    continue;
+                }
+                
+                let remove_result = task_manager.remove_task(id_result.unwrap());
+                if remove_result.is_err() {
+                    println("Error: " + remove_result.unwrap_err());
+                } else {
+                    println("Task removed successfully.");
+                }
+            },
+            "7" => {
+                let save_result = task_manager.save();
+                if save_result.is_err() {
+                    println("Error saving tasks: " + save_result.unwrap_err());
+                } else {
+                    println("Tasks saved successfully.");
+                }
+            },
+            "8" => {
+                println("Saving tasks before exit...");
+                task_manager.save();
+                println("Goodbye!");
+                running = false;
+            },
+            _ => {
+                println("Invalid choice. Please enter a number from 1 to 8.");
+            }
+        }
+    }
+}</code></pre>
+          
+          <p>The main function:</p>
+          <ol>
+            <li>Creates a new <code>TaskManager</code></li>
+            <li>Loads any existing tasks from the file</li>
+            <li>Enters a loop to display the menu and process user choices</li>
+            <li>Handles different user actions using a <code>match</code> expression</li>
+            <li>Saves all tasks before exiting</li>
+          </ol>
+        </section>
+        
+        <section id="complete-code">
+          <h2>Complete Code</h2>
+          <p>The complete code for the Todo List Manager is available in the <a href="todo_list.sr">todo_list.sr</a> file.</p>
+        </section>
+        
+        <section id="running">
+          <h2>Running the Program</h2>
+          <p>To run the Todo List Manager:</p>
+          
+          <ol>
+            <li>Save the code in a file named <code>todo_list.sr</code></li>
+            <li>Open a terminal and navigate to the directory containing your file</li>
+            <li>Compile and run the program with the following command:</li>
+          </ol>
+          
+          <pre><code class="language-bash">shitrust run todo_list.sr</code></pre>
+          
+          <p>You should see the menu displayed, and you can start adding and managing tasks. The tasks will be saved to a file named <code>tasks.json</code> in the same directory.</p>
+          
+          <h3>Sample Session</h3>
+          <pre><code>Tasks loaded successfully.
+
+===== ShitRust Todo List Manager =====
+1. Add a new task
+2. List all tasks
+3. List pending tasks
+4. List completed tasks
+5. Mark task as completed
+6. Remove a task
+7. Save tasks
+8. Exit
+======================================
+Enter your choice (1-8): 1
+Enter task description: Finish ShitRust tutorial
+Enter due date (YYYY-MM-DD) or leave empty for today: 
+Task added: 1. [ ] Finish ShitRust tutorial (Due: 2023-06-10)
+
+===== ShitRust Todo List Manager =====
+1. Add a new task
+2. List all tasks
+3. List pending tasks
+4. List completed tasks
+5. Mark task as completed
+6. Remove a task
+7. Save tasks
+8. Exit
+======================================
+Enter your choice (1-8): 1
+Enter task description: Build a web app
+Enter due date (YYYY-MM-DD) or leave empty for today: 2023-06-20
+Task added: 2. [ ] Build a web app (Due: 2023-06-20)
+
+===== ShitRust Todo List Manager =====
+1. Add a new task
+2. List all tasks
+3. List pending tasks
+4. List completed tasks
+5. Mark task as completed
+6. Remove a task
+7. Save tasks
+8. Exit
+======================================
+Enter your choice (1-8): 2
+Tasks:
+1. [ ] Finish ShitRust tutorial (Due: 2023-06-10)
+2. [ ] Build a web app (Due: 2023-06-20)
+
+===== ShitRust Todo List Manager =====
+1. Add a new task
+2. List all tasks
+3. List pending tasks
+4. List completed tasks
+5. Mark task as completed
+6. Remove a task
+7. Save tasks
+8. Exit
+======================================
+Enter your choice (1-8): 5
+Enter task ID to mark as completed: 1
+Task marked as completed.
+
+===== ShitRust Todo List Manager =====
+1. Add a new task
+2. List all tasks
+3. List pending tasks
+4. List completed tasks
+5. Mark task as completed
+6. Remove a task
+7. Save tasks
+8. Exit
+======================================
+Enter your choice (1-8): 2
+Tasks:
+1. [x] Finish ShitRust tutorial (Due: 2023-06-10)
+2. [ ] Build a web app (Due: 2023-06-20)
+
+===== ShitRust Todo List Manager =====
+1. Add a new task
+2. List all tasks
+3. List pending tasks
+4. List completed tasks
+5. Mark task as completed
+6. Remove a task
+7. Save tasks
+8. Exit
+======================================
+Enter your choice (1-8): 7
+Tasks saved successfully.
+
+===== ShitRust Todo List Manager =====
+1. Add a new task
+2. List all tasks
+3. List pending tasks
+4. List completed tasks
+5. Mark task as completed
+6. Remove a task
+7. Save tasks
+8. Exit
+======================================
+Enter your choice (1-8): 8
+Saving tasks before exit...
+Goodbye!</code></pre>
+        </section>
+        
+        <section id="extensions">
+          <h2>Extensions and Challenges</h2>
+          <p>Now that you've built a basic Todo List Manager, here are some ideas to extend and improve it:</p>
+          
+          <ol>
+            <li>Add task priorities (high, medium, low)</li>
+            <li>Implement task categories or tags</li>
+            <li>Add the ability to sort tasks by due date, priority, etc.</li>
+            <li>Implement task reminders or notifications</li>
+            <li>Add a search function to find tasks by keywords</li>
+            <li>Create a simple GUI version using a ShitRust GUI library</li>
+          </ol>
+          
+          <p>These extensions will give you more practice with ShitRust and help you build a more powerful task management application.</p>
+        </section>
+        
+        <section>
+          <h2>Next Steps</h2>
+          <p>Congratulations on completing this tutorial! You've built a functional Todo List Manager and learned about several key features of ShitRust.</p>
+          
+          <p>Check out our other tutorials to continue your ShitRust journey:</p>
+          
+          <ul>
+            <li><a href="../calculator/index.html">Building a Command-Line Calculator</a></li>
+            <li><a href="../adventure/index.html">Building a Text Adventure Game</a></li>
+          </ul>
+          
+          <p>Or explore the <a href="../../reference.html">Language Reference</a> to learn more about ShitRust's features.</p>
+        </section>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>ShitRust</h3>
+          <p>A programming language combining features from Rust, Python, and C/C++.</p>
+          <p>Released under the <a href="#">MIT License</a>.</p>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="../../index.html#features">Features</a></li>
+            <li><a href="../../index.html#installation">Installation</a></li>
+            <li><a href="../../index.html#examples">Examples</a></li>
+            <li><a href="../../index.html#documentation">Documentation</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Documentation</h3>
+          <ul class="footer-links">
+            <li><a href="../../guide.html">Guide</a></li>
+            <li><a href="../../reference.html">Reference</a></li>
+            <li><a href="../../api.html">API</a></li>
+            <li><a href="../../tutorials.html">Tutorials</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h3>Developer</h3>
+          <ul class="footer-links">
+            <li><a href="https://github.com/._w0wzers">._w0wzers</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2023 ShitRust Language. Developed by ._w0wzers. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-batch.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html> 

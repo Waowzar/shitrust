@@ -1,0 +1,131 @@
+// Collections Example in ShitRust
+// This file demonstrates various collection types and operations
+
+// Import the collections module
+use collections;
+
+fn main() -> void {
+    println("========== Collections in ShitRust ==========");
+    
+    // --- Basic List Operations ---
+    println("\n--- Lists ---");
+    let numbers = [1, 2, 3, 4, 5];
+    println("List: " + numbers.to_string());
+    
+    // List operations
+    println("First element: " + numbers[0].to_string());
+    println("Length: " + numbers.length().to_string());
+    
+    // List methods
+    numbers.push(6);
+    println("After push: " + numbers.to_string());
+    
+    let last = numbers.pop();
+    println("Popped element: " + last.to_string());
+    println("After pop: " + numbers.to_string());
+    
+    // List comprehensions
+    let squares = [x * x for x in numbers];
+    println("Squares: " + squares.to_string());
+    
+    let even_numbers = [x for x in numbers if x % 2 == 0];
+    println("Even numbers: " + even_numbers.to_string());
+    
+    // --- Advanced Vector Operations ---
+    println("\n--- Vector ---");
+    let vec = collections.Vector([10, 20, 30, 40, 50]);
+    println("Vector: " + vec.to_string());
+    
+    // Vector methods
+    vec = vec.push(60);
+    println("After push: " + vec.to_string());
+    
+    let item = vec.get(2);
+    println("Item at index 2: " + item.to_string());
+    
+    vec = vec.insert(2, 25);
+    println("After insert at index 2: " + vec.to_string());
+    
+    vec = vec.remove(1);
+    println("After remove at index 1: " + vec.to_string());
+    
+    // Filter and map
+    vec = vec.filter(|x| -> bool { return x > 30; });
+    println("After filter > 30: " + vec.to_string());
+    
+    vec = vec.map(|x| -> int { return x * 2; });
+    println("After map (x * 2): " + vec.to_string());
+    
+    // --- HashMap ---
+    println("\n--- HashMap ---");
+    let map = collections.HashMap();
+    
+    // Add key-value pairs
+    map = map.set("name", "Alice");
+    map = map.set("age", 30);
+    map = map.set("city", "New York");
+    
+    println("HashMap contents:");
+    let keys = map.keys();
+    for key in keys {
+        println("  " + key.to_string() + ": " + map.get(key).to_string());
+    }
+    
+    // Check and get values
+    println("Contains 'age': " + map.contains_key("age").to_string());
+    println("Age value: " + map.get("age").to_string());
+    println("Country (with default): " + map.get("country", "Unknown").to_string());
+    
+    // --- Set ---
+    println("\n--- Set ---");
+    let set = collections.Set([1, 2, 3, 4, 3, 2, 1]);
+    println("Set from array with duplicates: " + set.to_list().to_string());
+    
+    // Set operations
+    set = set.add(5);
+    println("After adding 5: " + set.to_list().to_string());
+    
+    let removed = set.remove(2);
+    println("Removed 2: " + removed.to_string());
+    println("After removing 2: " + set.to_list().to_string());
+    
+    println("Contains 3: " + set.contains(3).to_string());
+    println("Contains 10: " + set.contains(10).to_string());
+    
+    // Set operations with another set
+    let other_set = collections.Set([3, 4, 5, 6, 7]);
+    println("Other set: " + other_set.to_list().to_string());
+    
+    let intersection = set.intersection(other_set);
+    println("Intersection: " + intersection.to_list().to_string());
+    
+    let union = set.union(other_set);
+    println("Union: " + union.to_list().to_string());
+    
+    let difference = set.difference(other_set);
+    println("Difference (set - other_set): " + difference.to_list().to_string());
+    
+    // --- PriorityQueue ---
+    println("\n--- PriorityQueue ---");
+    let pq = collections.PriorityQueue();
+    
+    // Enqueue items with priorities
+    pq = pq.enqueue("Low priority task", 1);
+    pq = pq.enqueue("Medium priority task", 5);
+    pq = pq.enqueue("High priority task", 10);
+    pq = pq.enqueue("Critical task", 20);
+    
+    println("Priority Queue size: " + pq.size().to_string());
+    
+    // Peek at the highest priority item without removing
+    println("Next task to process: " + pq.peek().to_string());
+    
+    // Dequeue items (highest priority first)
+    while !pq.is_empty() {
+        let task = pq.dequeue();
+        println("Processing: " + task.to_string());
+        pq = pq; // Update reference after dequeue
+    }
+    
+    println("\n========== Collections Example Complete ==========");
+} 

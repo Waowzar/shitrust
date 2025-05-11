@@ -1,0 +1,55 @@
+// Hello World in ShitRust - A simple example
+
+// Function to generate a greeting
+fn generate_greeting(name: string) -> string {
+    let greeting = "Hello, " + name + "!";
+    return greeting;
+}
+
+// Main function - entry point of the program
+fn main() -> void {
+    // Basic println
+    println("Hello, ShitRust World!");
+    
+    // Variables with type inference
+    let name = "ShitRust";
+    let version = 0.1;
+    
+    // String concatenation and method calls
+    println("Welcome to " + name + " version " + version.to_string() + "!");
+    
+    // Conditional statement
+    if (version < 1.0) {
+        println("This is an early preview version.");
+    } else {
+        println("This is a stable release.");
+    }
+    
+    // Function call
+    let message = generate_greeting("Programmer");
+    println(message);
+    
+    // Numeric operations
+    let a = 5;
+    let b = 3;
+    println("Basic math:");
+    println("  " + a.to_string() + " + " + b.to_string() + " = " + (a + b).to_string());
+    println("  " + a.to_string() + " - " + b.to_string() + " = " + (a - b).to_string());
+    println("  " + a.to_string() + " * " + b.to_string() + " = " + (a * b).to_string());
+    println("  " + a.to_string() + " / " + b.to_string() + " = " + (a / b).to_string());
+    
+    // Boolean expressions
+    let is_demo = true;
+    if (is_demo && version < 1.0) {
+        println("This is a demonstration of a preview version.");
+    }
+    
+    // A simple loop
+    let counter = 0;
+    while (counter < 3) {
+        println("Loop iteration: " + counter.to_string());
+        counter = counter + 1;
+    }
+    
+    println("Goodbye from ShitRust!");
+} 

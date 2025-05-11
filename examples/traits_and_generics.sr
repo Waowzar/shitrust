@@ -1,0 +1,176 @@
+// ShitRust Traits and Generics Example
+// This example demonstrates the enhanced trait system and generics
+
+// Import the standard library
+use std.io;
+use std.collections.Vector;
+
+// Define a generic trait
+trait Printable<T> {
+    // Method without a default implementation
+    fn print(value: T) -> void;
+    
+    // Method with a default implementation
+    fn debug_print(value: T) -> string {
+        return "Debug: " + value.to_string();
+    }
+}
+
+// Define another trait for string conversion
+trait ToString {
+    fn to_string() -> string;
+}
+
+// Define a generic container
+struct Box<T> {
+    value: T,
+    
+    fn get() -> T {
+        return this.value;
+    }
+    
+    fn set(new_value: T) -> void {
+        this.value = new_value;
+    }
+    
+    // Static method to create a new box
+    static fn create(value: T) -> Box<T> {
+        return Box { value: value };
+    }
+}
+
+// Implement ToString for Box<int>
+impl ToString for Box<int> {
+    fn to_string() -> string {
+        return "Box<int>(" + this.value.to_string() + ")";
+    }
+}
+
+// Implement ToString for Box<string>
+impl ToString for Box<string> {
+    fn to_string() -> string {
+        return "Box<string>(\"" + this.value + "\")";
+    }
+}
+
+// Implement Printable for Box<int>
+impl Printable<int> for Box<int> {
+    fn print(value: int) -> void {
+        println("Box contains integer: " + value.to_string());
+    }
+}
+
+// Implement Printable for Box<string>
+impl Printable<string> for Box<string> {
+    fn print(value: string) -> void {
+        println("Box contains string: \"" + value + "\"");
+    }
+    
+    // Override the default implementation
+    fn debug_print(value: string) -> string {
+        return "DEBUG BOX<STRING>: \"" + value + "\"";
+    }
+}
+
+// Define a trait with associated type
+trait Container {
+    type ItemType;
+    
+    fn add(item: ItemType) -> void;
+    fn get(index: int) -> ItemType?;
+    fn size() -> int;
+}
+
+// Define a generic collection
+struct Collection<T> {
+    items: Vector<T>,
+    
+    static fn create() -> Collection<T> {
+        return Collection { items: Vector::create() };
+    }
+}
+
+// Implement Container for Collection
+impl Container for Collection<T> {
+    type ItemType = T;
+    
+    fn add(item: T) -> void {
+        this.items.push(item);
+    }
+    
+    fn get(index: int) -> T? {
+        if index >= 0 && index < this.size() {
+            return this.items.get(index);
+        }
+        return none;
+    }
+    
+    fn size() -> int {
+        return this.items.size();
+    }
+}
+
+// Function that uses trait bounds
+fn print_any<T: ToString>(item: T) -> void {
+    println(item.to_string());
+}
+
+// Function with multiple trait bounds
+fn print_and_modify<T: ToString + Container>(container: T) -> void {
+    println("Container size: " + container.size().to_string());
+    println("Container string: " + container.to_string());
+}
+
+// Main function
+fn main() -> void {
+    println("===== ShitRust Traits and Generics Demo =====\n");
+    
+    // Create boxes with different types
+    let int_box = Box::create(42);
+    let string_box = Box::create("Hello, traits!");
+    
+    // Use toString trait implementation
+    println("Int box: " + int_box.to_string());
+    println("String box: " + string_box.to_string());
+    
+    // Use Printable trait implementation
+    int_box.print(int_box.get());
+    string_box.print(string_box.get());
+    
+    // Use default and overridden methods
+    println(int_box.debug_print(int_box.get()));
+    println(string_box.debug_print(string_box.get()));
+    
+    // Create a collection and use the Container trait
+    let numbers = Collection::create<int>();
+    numbers.add(1);
+    numbers.add(2);
+    numbers.add(3);
+    
+    println("\nCollection demo:");
+    println("Size: " + numbers.size().to_string());
+    
+    for i in 0..numbers.size() {
+        let item = numbers.get(i);
+        match item {
+            some(value) => println("Item " + i.to_string() + ": " + value.to_string()),
+            none => println("Item " + i.to_string() + " not found")
+        }
+    }
+    
+    // Optional chaining with the Container trait
+    let maybe_item = numbers.get(1);
+    let item_str = maybe_item?.to_string() ?? "Not found";
+    println("Item with optional chaining: " + item_str);
+    
+    // Out of bounds access with optional chaining
+    let out_of_bounds = numbers.get(99)?.to_string() ?? "Not found";
+    println("Out of bounds item: " + out_of_bounds);
+    
+    // Using trait bound functions
+    println("\nUsing trait bound functions:");
+    print_any(int_box);
+    print_any(string_box);
+    
+    println("\n===== Demo Complete =====");
+} 

@@ -1,0 +1,47 @@
+# EditorConfig helps maintain consistent coding styles
+# for multiple developers working on the same project.
+# https://editorconfig.org
+
+# top-most EditorConfig file
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# Rust files
+[*.rs]
+indent_size = 4
+
+# ShitRust language files
+[*.sr]
+indent_size = 4
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+
+# YAML Config files
+[*.{yml,yaml}]
+indent_size = 2
+
+# JSON files
+[*.json]
+indent_size = 2
+
+# Build script files
+[*.{sh,bat}]
+indent_size = 4
+
+# Web files
+[*.{html,css,js}]
+indent_size = 2
+
+# Makefile requires tabs
+[Makefile]
+indent_style = tab 

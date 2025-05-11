@@ -1,0 +1,121 @@
+// IO Operations Example in ShitRust
+// This file demonstrates file and IO operations
+
+// Import the io module
+use io;
+
+fn main() -> void {
+    println("========== IO Operations in ShitRust ==========");
+    
+    // --- Basic Input/Output ---
+    println("\n--- Basic Input/Output ---");
+    
+    // Print different types of data
+    println("Integer: " + 42.to_string());
+    println("Float: " + 3.14159.to_string());
+    println("Boolean: " + true.to_string());
+    
+    // Print without newline
+    print("This is printed ");
+    print("on the same line. ");
+    println("And now we end the line.");
+    
+    // User input (commented out since it would block execution in tests)
+    // let name = io.input("Enter your name: ");
+    // println("Hello, " + name + "!");
+    
+    // --- File Operations ---
+    println("\n--- File Operations ---");
+    
+    // --- Writing to a file ---
+    println("Writing to a file...");
+    let content = "Hello, ShitRust!\nThis is a test file.\nLine 3 of the file.";
+    
+    // Open file in write mode
+    let file = io.open("test_file.txt", "w");
+    file.write_text(content);
+    println("File written successfully.");
+    
+    // --- Reading from a file ---
+    println("\nReading the file back...");
+    
+    // Open file in read mode
+    let read_file = io.open("test_file.txt", "r");
+    let file_content = read_file.read_text();
+    println("File content:\n" + file_content);
+    
+    // --- Reading file line by line ---
+    println("\nReading the file line by line...");
+    let line_file = io.open("test_file.txt", "r");
+    let lines = line_file.read_lines();
+    
+    for i in 0..lines.length() {
+        println("Line " + (i + 1).to_string() + ": " + lines[i]);
+    }
+    
+    // --- Appending to a file ---
+    println("\nAppending to the file...");
+    let append_file = io.open("test_file.txt", "a");
+    append_file.write_text("\nThis line was appended.");
+    println("Appended to the file.");
+    
+    // Read back the modified file
+    let modified_file = io.open("test_file.txt", "r");
+    let modified_content = modified_file.read_text();
+    println("\nModified file content:\n" + modified_content);
+    
+    // --- Binary file operations ---
+    println("\n--- Binary File Operations ---");
+    
+    // Create some binary data (bytes)
+    let bytes = [65, 66, 67, 68, 69, 70]; // ASCII for "ABCDEF"
+    
+    // Write bytes to a binary file
+    let binary_file = io.open("binary_test.bin", "w");
+    binary_file.write_bytes(bytes);
+    println("Binary data written.");
+    
+    // Read the binary data back
+    let binary_read = io.open("binary_test.bin", "r");
+    let read_bytes = binary_read.read_bytes();
+    
+    // Print the bytes
+    print("Read bytes: [");
+    for i in 0..read_bytes.length() {
+        print(read_bytes[i].to_string());
+        if i < read_bytes.length() - 1 {
+            print(", ");
+        }
+    }
+    println("]");
+    
+    // --- File system operations ---
+    println("\n--- File System Operations ---");
+    
+    // Check if files exist
+    println("test_file.txt exists: " + io.exists("test_file.txt").to_string());
+    println("nonexistent.txt exists: " + io.exists("nonexistent.txt").to_string());
+    
+    // File type checks
+    println("test_file.txt is a file: " + io.is_file("test_file.txt").to_string());
+    
+    // Create a directory
+    io.create_dir("test_dir");
+    println("Created directory 'test_dir'");
+    println("test_dir is a directory: " + io.is_dir("test_dir").to_string());
+    
+    // List directory contents
+    let dir_contents = io.list_dir(".");
+    println("\nContents of current directory:");
+    for item in dir_contents {
+        println("  " + item);
+    }
+    
+    // Clean up - remove the files and directory we created
+    io.remove_file("test_file.txt");
+    io.remove_file("binary_test.bin");
+    io.remove_dir("test_dir");
+    println("\nCleaned up test files and directory.");
+    
+    println("\n========== IO Operations Example Complete ==========");
+} 

@@ -1,0 +1,116 @@
+// Time Module Example in ShitRust
+// This file demonstrates various time-related functionality
+
+// Import the time module
+use time;
+
+fn main() -> void {
+    println("========== Time Module in ShitRust ==========");
+    
+    // --- Basic time operations ---
+    println("\n--- Basic Time Operations ---");
+    
+    // Get the current timestamp
+    let now = time.now();
+    println("Current timestamp (ms): " + now.to_string());
+    
+    // Sleep for a short time
+    println("Sleeping for 1 second...");
+    time.sleep(1000); // 1000 milliseconds = 1 second
+    
+    let after = time.now();
+    println("Time after sleep: " + after.to_string());
+    println("Elapsed time: " + (after - now).to_string() + "ms");
+    
+    // --- DateTime Object ---
+    println("\n--- DateTime Object ---");
+    
+    // Create a DateTime object for the current time
+    let current = time.DateTime();
+    println("Current DateTime: " + current.format());
+    
+    // Get individual components
+    println("Year: " + current.year().to_string());
+    println("Month: " + current.month().to_string());
+    println("Day: " + current.day().to_string());
+    println("Hour: " + current.hour().to_string());
+    println("Minute: " + current.minute().to_string());
+    println("Second: " + current.second().to_string());
+    
+    // Format the date in different ways
+    println("Date only: " + current.format("%Y-%m-%d"));
+    println("Time only: " + current.format("%H:%M:%S"));
+    println("Custom format: " + current.format("%d/%m/%Y %H:%M"));
+    
+    // Create a DateTime from a specific timestamp
+    let past = time.DateTime(1609459200000); // 2021-01-01 00:00:00
+    println("Past date: " + past.format());
+    
+    // Add time to a DateTime
+    let future = current.add(7, "days");
+    println("One week from now: " + future.format());
+    
+    let hour_later = current.add(1, "hours");
+    println("One hour from now: " + hour_later.format());
+    
+    // --- Timer for measuring performance ---
+    println("\n--- Timer for Benchmarking ---");
+    
+    // Create a timer
+    let timer = time.Timer();
+    
+    // Start the timer
+    timer = timer.start();
+    
+    // Perform some work
+    let sum = 0;
+    for i in 0..1000000 {
+        sum = sum + i;
+    }
+    
+    // Stop the timer
+    let elapsed = timer.stop();
+    println("Sum calculation took " + elapsed.to_string() + "ms");
+    
+    // Reset and reuse the timer
+    timer = timer.reset();
+    timer = timer.start();
+    
+    // Do something else
+    let product = 1;
+    for i in 1..10 {
+        product = product * i;
+    }
+    
+    // Get elapsed time without stopping
+    let running_time = timer.elapsed();
+    println("Elapsed time while running: " + running_time.to_string() + "ms");
+    
+    // Stop the timer
+    let total_time = timer.stop();
+    println("Total time: " + total_time.to_string() + "ms");
+    
+    // --- Measuring function execution time ---
+    println("\n--- Measuring Function Execution ---");
+    
+    // Define a function to measure
+    fn fibonacci(n: int) -> int {
+        if n <= 1 {
+            return n;
+        }
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+    
+    // Measure execution time using the measure function
+    // Note: In a real implementation, this would execute the function
+    let result = time.measure(fibonacci, 20);
+    
+    println("Execution took " + result.time.to_string() + "ms");
+    println("Result: " + result.result.to_string());
+    
+    // Format current time using the utility function
+    println("\nFormatted current time: " + time.format_current_time());
+    println("Custom format: " + time.format_current_time("%H:%M:%S"));
+    
+    println("\n========== Time Module Example Complete ==========");
+} 
