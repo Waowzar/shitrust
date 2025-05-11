@@ -32,7 +32,7 @@ ShitRust is a programming language that combines features from Rust, Python, and
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/shitrust.git
+git clone https://github.com/Waowzar/shitrust.git
 cd shitrust
 
 # Build the compiler
