@@ -47,9 +47,8 @@ ShitRust is a powerful and flexible programming language that combines the best 
 - Hex encoding/decoding and Base64 utilities
 
 ### Developer Experience
-- Rich CLI with compilation, running, and formatting commands
-- Strict type checking mode for catching errors early
-- Detailed error reporting with color-coded messages
+- Rich CLI with compilation, running, and formatting commands (Kinda a** though ngl)
+- Strict type checking mode for catching errors
 - Performance timing for compilation and execution phases
 
 ## Installation
