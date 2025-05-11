@@ -12,7 +12,7 @@ ShitRust is a programming language that combines features from Rust, Python, and
 - Simplicity and readability from Python
 - Performance and low-level control from C/C++
 - LLVM-based optimizing compiler
-- Interactive interpreter for rapid development
+- Interpreter for development
 - Integrated code formatter
 
 ## New Features in this Version
