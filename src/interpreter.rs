@@ -159,6 +159,7 @@ impl Environment {
 pub struct Interpreter {
     environment: Environment,
     globals: Environment,
+    current_source_file: String,
 }
 
 impl Interpreter {
@@ -167,6 +168,7 @@ impl Interpreter {
         Interpreter {
             environment: globals.clone(),
             globals,
+            current_source_file: String::new(),
         }
     }
 
@@ -1050,6 +1052,57 @@ impl Interpreter {
         
         // For now, always return None
         Ok(Value::None)
+    }
+
+    /// Execute a program with async support
+    pub fn execute_async(&mut self, program: &Program) -> Result<Value> {
+        // Set the current source file
+        self.current_source_file = program.source_file.clone();
+        
+        // Find the main function
+        let main_function = self.find_main_function(program)?;
+        
+        // Create AsyncRuntime object
+        let async_runtime_constructor = self.get_value("AsyncRuntime")
+            .ok_or_else(|| ShitRustError::RuntimeError(
+                "AsyncRuntime not found. Make sure stdlib::async_runtime is imported".to_string()
+            ))?;
+        
+        // Instantiate AsyncRuntime
+        let async_runtime = self.call_value(&async_runtime_constructor, &[])?;
+        
+        // Define block_on function
+        let block_on_method = if let Value::Object(obj) = &async_runtime {
+            // Try to find the block_on method
+            obj.get_method("block_on")
+                .ok_or_else(|| ShitRustError::RuntimeError(
+                    "block_on method not found on AsyncRuntime".to_string()
+                ))?
+        } else {
+            return Err(ShitRustError::RuntimeError(
+                "AsyncRuntime is not an object".to_string()
+            ));
+        };
+        
+        // Call main function through the async runtime
+        let main_result = self.call_value(&block_on_method, &[main_function])?;
+        
+        Ok(main_result)
+    }
+    
+    /// Clone the interpreter
+    pub fn clone(&self) -> Self {
+        // Create a new environment
+        let global_env = Environment::new();
+        
+        // Clone the current environment
+        let current_env = self.environment.clone();
+        
+        Interpreter {
+            environment: current_env,
+            globals: global_env,
+            current_source_file: self.current_source_file.clone(),
+        }
     }
 }
 
