@@ -1,239 +1,245 @@
-// ShitRust Advanced Features Demo - 2.0
-// This example demonstrates the new enhanced features of ShitRust
+// ShitRust Advanced Features Example
+// This example demonstrates the new and advanced features of ShitRust
 
-// Module imports with the new 'use' keyword
-use std.io;
-use std.collections.HashMap;
-use std.time as timing;
+// Import modules from standard library
+use stdlib::collections::HashMap;
+use stdlib::time::Duration;
+use stdlib::concurrent::{spawn, sleep, Mutex, Arc};
+use stdlib::crypto::{sha256, encrypt, decrypt, generate_aes_key, generate_nonce};
+use stdlib::async_runtime::{AsyncRuntime};
 
-// Constants declaration
-const PI: float = 3.14159265359;
-const MAX_USERS: int = 1000;
-const APP_NAME: string = "ShitRust Advanced Demo";
-
-// Type aliases
-type UserId = int;
-type UserName = string;
-type UserMap<T> = HashMap<UserId, T>;
+// Generic type with type parameter
+struct Queue<T> {
+    items: [T],
+    
+    // Method with generic type
+    pub fn new() -> Queue<T> {
+        Queue { items: [] }
+    }
+    
+    pub fn enqueue(mut this, item: T) -> void {
+        this.items.push(item);
+    }
+    
+    pub fn dequeue(mut this) -> Option<T> {
+        if this.items.is_empty() {
+            return None;
+        }
+        return Some(this.items.remove(0));
+    }
+    
+    pub fn size(this) -> int {
+        return this.items.len();
+    }
+}
 
 // Trait definition
 trait Printable {
-    fn print() -> void;
-    fn debug_print() -> string;
+    fn to_string(this) -> string;
+    fn print(this) -> void {
+        println(this.to_string());
+    }
 }
 
-// Generic trait
-trait Container<T> {
-    fn add(item: T) -> void;
-    fn get(index: int) -> T;
-    fn size() -> int;
-}
-
-// Struct with generic parameter
-struct User<T> {
-    id: UserId,
-    name: UserName,
-    data: T,
-    active: bool,
+// Struct implementing a trait
+struct Person {
+    name: string,
+    age: int,
     
-    // Method using 'this' keyword
-    fn is_active() -> bool {
-        return this.active;
-    }
-    
-    // Static method
-    static fn create(id: UserId, name: UserName, data: T) -> User<T> {
-        return User {
-            id: id,
-            name: name,
-            data: data,
-            active: true
-        };
+    pub fn new(name: string, age: int) -> Person {
+        Person { name, age }
     }
 }
 
-// Implementing a trait for a struct
-impl Printable for User<string> {
-    fn print() -> void {
-        println("User: " + this.name + " (ID: " + this.id.to_string() + ")");
-    }
-    
-    fn debug_print() -> string {
-        return "User { id: " + this.id.to_string() + 
-               ", name: " + this.name + 
-               ", data: " + this.data +
-               ", active: " + this.active.to_string() + " }";
+// Trait implementation
+impl Printable for Person {
+    fn to_string(this) -> string {
+        return "Person { name: \"" + this.name + "\", age: " + this.age.to_string() + " }";
     }
 }
 
-// Enum with generic parameter
+// Enum with variants
 enum Result<T, E> {
     Ok(T),
-    Err(E)
+    Err(E),
+    
+    pub fn is_ok(this) -> bool {
+        match this {
+            Result::Ok(_) => true,
+            _ => false
+        }
+    }
+    
+    pub fn is_err(this) -> bool {
+        match this {
+            Result::Err(_) => true,
+            _ => false
+        }
+    }
+    
+    pub fn unwrap(this) -> T {
+        match this {
+            Result::Ok(value) => value,
+            Result::Err(err) => panic("Called unwrap on an Err: " + err.to_string())
+        }
+    }
 }
 
-// Function returning a Result type
-fn divide(a: int, b: int) -> Result<int, string> {
+// Asynchronous function example
+async fn fetch_data(url: string) -> string {
+    // Simulate network delay
+    await sleep(1000);
+    return "Data from " + url;
+}
+
+// Function using the pipeline operator
+fn process_data(data: string) -> string {
+    return data
+        |> str_trim
+        |> str_uppercase
+        |> (s => s + "!");
+}
+
+// Function demonstrating pattern matching
+fn describe_value(value: any) -> string {
+    match value {
+        0 => "Zero",
+        n if n > 0 => "Positive number: " + n.to_string(),
+        n if n < 0 => "Negative number: " + n.to_string(),
+        "hello" => "Greeting",
+        s if s is string => "String: " + s,
+        [a, b, ...rest] => "List with " + (rest.len() + 2).to_string() + " elements",
+        { name, age } if age > 18 => "Adult named " + name,
+        _ => "Unknown value"
+    }
+}
+
+// Function demonstrating error handling
+fn divide(a: int, b: int) -> Result<float, string> {
     if b == 0 {
         return Result::Err("Division by zero");
     }
-    return Result::Ok(a / b);
+    return Result::Ok(a as float / b as float);
 }
 
-// Async function example
-async fn fetch_data(url: string) -> Result<string, string> {
-    // Simulating network request with delay
-    await timing.sleep(1000);
-    
-    if url.contains("error") {
-        return Result::Err("Failed to fetch data");
-    }
-    
-    return Result::Ok("Data from " + url);
-}
-
-// Function demonstrating list comprehension
-fn list_comprehension_demo() -> void {
-    let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    
-    // List comprehension with filter
-    let evens = [x for x in numbers if x % 2 == 0];
-    println("Even numbers: " + evens.to_string());
-    
-    // List comprehension with transformation
-    let squares = [x * x for x in numbers];
-    println("Squares: " + squares.to_string());
-    
-    // Nested list comprehension
-    let matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
-    let flattened = [cell for row in matrix for cell in row];
-    println("Flattened matrix: " + flattened.to_string());
-}
-
-// Function demonstrating match expressions
-fn match_demo(value: int) -> string {
-    let result = match value {
-        0 => "Zero",
-        1 | 2 | 3 => "Small number",
-        n if n < 10 => "Single digit",
-        n if n % 2 == 0 => "Even number",
-        _ => "Other number"
-    };
-    
-    return result;
-}
-
-// Function demonstrating pipeline operator
-fn pipeline_demo() -> void {
-    let names = ["Alice", "Bob", "Charlie", "David"];
-    
-    // Using pipeline operator
-    let result = names
-        |> [name.to_upper() for name in _]
-        |> [name for name in _ if name.length() > 4]
-        |> _.join(", ");
-    
-    println("Pipeline result: " + result);
-}
-
-// Function demonstrating optional chaining
-fn optional_chaining_demo(user: User<string>?) -> void {
-    // Optional chaining
-    let username = user?.name ?? "Unknown user";
-    println("Username: " + username);
-    
-    // Optional method call
-    let is_active = user?.is_active() ?? false;
-    println("Is active: " + is_active.to_string());
-}
-
-// Main function
+// Main function using concurrency
 fn main() -> void {
-    println("===== ShitRust Advanced Features Demo 2.0 =====\n");
+    println("=== ShitRust Advanced Features Demo ===\n");
     
-    // Using constants
-    println("Application: " + APP_NAME);
-    println("Pi value: " + PI.to_string());
-    println("Max users: " + MAX_USERS.to_string() + "\n");
-    
-    // Creating a user
-    let user = User::create(1, "John Doe", "Developer");
-    println("Created user: " + user.name);
-    
-    // Using Printable trait
-    user.print();
-    println("Debug info: " + user.debug_print() + "\n");
-    
-    // List comprehension
-    println("--- List Comprehension Demo ---");
-    list_comprehension_demo();
+    // Generic types
+    println("--- Generic Types ---");
+    let queue = Queue::<string>::new();
+    queue.enqueue("first");
+    queue.enqueue("second");
+    queue.enqueue("third");
+    println("Queue size: " + queue.size().to_string());
+    println("Dequeued: " + queue.dequeue().unwrap());
     println();
     
-    // Match expression
-    println("--- Match Expression Demo ---");
-    for i in 0..15 {
-        println(i.to_string() + ": " + match_demo(i));
-    }
+    // Traits
+    println("--- Traits ---");
+    let person = Person::new("Alice", 28);
+    // Calling trait methods
+    println("Person to string: " + person.to_string());
+    person.print();
     println();
     
-    // Result handling
-    println("--- Result Handling Demo ---");
-    let div_result = divide(10, 2);
-    match div_result {
-        Result::Ok(value) => println("10 / 2 = " + value.to_string()),
-        Result::Err(err) => println("Error: " + err)
-    }
-    
-    let div_error = divide(10, 0);
-    match div_error {
-        Result::Ok(value) => println("10 / 0 = " + value.to_string()),
-        Result::Err(err) => println("Error: " + err)
-    }
+    // Pattern matching
+    println("--- Pattern Matching ---");
+    println(describe_value(42));
+    println(describe_value(-7));
+    println(describe_value("hello"));
+    println(describe_value("world"));
+    println(describe_value([1, 2, 3, 4]));
+    println(describe_value({ name: "Bob", age: 25 }));
     println();
     
-    // Try-catch error handling
-    println("--- Try-Catch Demo ---");
-    try {
-        let result = 10 / 0;
-        println("Result: " + result.to_string());
-    } catch e {
-        println("Exception caught: " + e.to_string());
-    } finally {
-        println("This runs regardless of exception");
-    }
-    println();
-    
-    // Async/await
-    println("--- Async/Await Demo ---");
-    println("Fetching data...");
-    
-    let data_result = await fetch_data("https://example.com/api");
-    match data_result {
-        Result::Ok(data) => println("Success: " + data),
-        Result::Err(err) => println("Error: " + err)
+    // Error handling
+    println("--- Error Handling ---");
+    let result1 = divide(10, 2);
+    if result1.is_ok() {
+        println("10 / 2 = " + result1.unwrap().to_string());
     }
     
-    let error_result = await fetch_data("https://example.com/error");
-    match error_result {
-        Result::Ok(data) => println("Success: " + data),
-        Result::Err(err) => println("Error: " + err)
+    let result2 = divide(5, 0);
+    if result2.is_err() {
+        match result2 {
+            Result::Err(msg) => println("Error: " + msg),
+            _ => {}
+        }
     }
     println();
     
     // Pipeline operator
-    println("--- Pipeline Operator Demo ---");
-    pipeline_demo();
+    println("--- Pipeline Operator ---");
+    let processed = process_data("  hello world  ");
+    println("Processed data: " + processed);
     println();
     
-    // Optional chaining
-    println("--- Optional Chaining Demo ---");
-    let maybe_user: User<string>? = User::create(2, "Jane Smith", "Designer");
-    optional_chaining_demo(maybe_user);
+    // Concurrency
+    println("--- Concurrency ---");
+    // Create shared counter with mutex
+    let counter = Arc::new(Mutex::new(0));
     
-    // Nullish value
-    let no_user: User<string>? = none;
-    optional_chaining_demo(no_user);
+    // Clone counters for threads
+    let counter1 = counter.clone();
+    let counter2 = counter.clone();
+    
+    // Spawn threads
+    let handle1 = spawn(fn() -> void {
+        for i in 0..5 {
+            let mut count = counter1.lock();
+            *count += 1;
+            println("Thread 1: " + count.to_string());
+            sleep(100);
+        }
+    });
+    
+    let handle2 = spawn(fn() -> void {
+        for i in 0..5 {
+            let mut count = counter2.lock();
+            *count += 1;
+            println("Thread 2: " + count.to_string());
+            sleep(150);
+        }
+    });
+    
+    // Wait for threads to complete
+    handle1.join();
+    handle2.join();
+    
+    // Show final counter value
+    println("Final counter value: " + counter.lock().to_string());
     println();
     
-    println("===== Demo Complete =====");
+    // Async/await
+    println("--- Async/Await ---");
+    let runtime = AsyncRuntime::new();
+    
+    // Run async function
+    let data = runtime.block_on(fetch_data("https://example.com"));
+    println(data);
+    println();
+    
+    // Cryptography
+    println("--- Cryptography ---");
+    let message = "Hello, encrypted world!";
+    println("Original message: " + message);
+    
+    // Generate key and nonce
+    let key = generate_aes_key();
+    let nonce = generate_nonce();
+    
+    // Hash the message
+    println("SHA-256 hash: " + sha256(message));
+    
+    // Encrypt and decrypt
+    let encrypted = encrypt(key, nonce, message);
+    println("Encrypted: " + encrypted);
+    
+    let decrypted = decrypt(key, nonce, encrypted);
+    println("Decrypted: " + decrypted);
+    println();
+    
+    println("=== Demo Complete ===");
 } 
