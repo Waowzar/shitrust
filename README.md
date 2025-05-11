@@ -11,27 +11,22 @@ ShitRust is a programming language that combines features from Rust, Python, and
 - Memory safety inspired by Rust
 - Simplicity and readability from Python
 - Performance and low-level control from C/C++
-- Modern syntax with clear error messages
-- Strong typing with type inference
 - LLVM-based optimizing compiler
 - Interactive interpreter for rapid development
-- Code formatter for consistent code style
+- Integrated code formatter
 
 ## New Features in this Version
 
-- Improved error reporting with source location information
-- Enhanced LLVM code generation with optimization levels
+- Improved error handling
+- Enhanced LLVM code generation with optimization
 - Support for asynchronous programming (async/await)
-- Pattern matching with enhanced capabilities
 - Range expressions for easier iteration
 - Built-in formatter for consistent code style
 - Better diagnostics and verbose output options
 - Compilation timing information
 - Option to emit LLVM IR for debugging
-- Colorized output with option to disable
-- New logo and branding assets
 - Improved build scripts for Windows and Unix platforms
-- Enhanced documentation
+- Added more shit to the documentation
 
 ## Installation
 
