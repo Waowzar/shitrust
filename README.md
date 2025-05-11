@@ -365,7 +365,6 @@ ShitRust comes with a comprehensive standard library:
 - `tests/` - Test suite
 - `assets/` - Logo and other assets
 - `docs/` - Documentation
-- `website/` - Official website resources
 
 ## Contributing
 
@@ -374,7 +373,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-Thanks to all contributors who have helped make ShitRust a better language! 
