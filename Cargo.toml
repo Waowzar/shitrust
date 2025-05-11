@@ -1,12 +1,12 @@
 [package]
 name = "shitrust"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
-authors = ["ShitRust Team"]
+authors = ["Waowzar"]
 description = "A programming language combining features from Rust, Python, and C/C++"
 readme = "README.md"
 license = "MIT"
-repository = "https://github.com/yourusername/shitrust"
+repository = "https://github.com/Waowzar/shitrust"
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
@@ -26,6 +26,14 @@ regex = "1.10"
 tokio = { version = "1.32", features = ["full"] }
 futures = "0.3"
 async-trait = "0.1"
+
+# New dependencies for the improved version
+sha2 = "0.10"
+hmac = "0.12"
+aes-gcm = "0.10"
+rand = "0.8"
+base64 = "0.21"
+thread_local = "1.1"
 
 [lib]
 name = "shitrust"
