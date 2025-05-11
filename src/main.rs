@@ -8,6 +8,7 @@ use anyhow::{Result, Context};
 use shitrust::compiler::{Compiler, CompilerOptions, OptimizationLevel};
 use shitrust::error::ShitRustError;
 use shitrust::formatter::Formatter;
+use shitrust::type_system::TypeChecker;
 
 /// ShitRust programming language compiler and runtime
 #[derive(Parser)]
@@ -38,6 +39,10 @@ struct Cli {
     /// Disable colored output
     #[arg(long)]
     no_color: bool,
+
+    /// Enable strict type checking
+    #[arg(long)]
+    strict_types: bool,
 
     #[command(subcommand)]
     command: Commands,
@@ -90,6 +95,18 @@ enum Commands {
         #[arg(short, long)]
         in_place: bool,
     },
+    /// Check a ShitRust program for type errors
+    Check {
+        /// Input file
+        #[arg(value_name = "FILE")]
+        input: PathBuf,
+    },
+    /// Run a ShitRust program in async mode
+    RunAsync {
+        /// Input file
+        #[arg(value_name = "FILE")]
+        input: PathBuf,
+    },
     /// Show information about ShitRust
     Info,
 }
@@ -110,6 +127,7 @@ fn main() -> Result<()> {
         show_timings: cli.timings,
         emit_llvm_ir: cli.emit_llvm,
         color_output: !cli.no_color,
+        strict_type_checking: cli.strict_types,
     };
     
     let compiler = Compiler::with_options(options);
@@ -130,6 +148,24 @@ fn main() -> Result<()> {
                 .with_context(|| format!("Failed to read file: {}", input.display()))?;
             
             let filename = input.to_string_lossy().to_string();
+            
+            // Type check if strict types are enabled
+            if cli.strict_types {
+                println!("{} {}", "Type checking".green().bold(),
+                    input.display().to_string().cyan());
+                
+                let mut lexer = shitrust::lexer::Lexer::with_filename(&source, filename.clone());
+                let tokens = lexer.scan_tokens()?;
+                
+                let mut parser = shitrust::parser::Parser::new(tokens);
+                let program = parser.parse()?;
+                
+                let mut type_checker = TypeChecker::new();
+                type_checker.check_program(&program.statements)?;
+                
+                println!("{}", "Type check passed".green().bold());
+            }
+            
             match compiler.compile_with_filename(&source, &output, Some(filename)) {
                 Ok(_) => {
                     if !cli.verbose && !cli.timings {
@@ -156,6 +192,24 @@ fn main() -> Result<()> {
                 .with_context(|| format!("Failed to read file: {}", input.display()))?;
             
             let filename = input.to_string_lossy().to_string();
+            
+            // Type check if strict types are enabled
+            if cli.strict_types {
+                println!("{} {}", "Type checking".green().bold(),
+                    input.display().to_string().cyan());
+                
+                let mut lexer = shitrust::lexer::Lexer::with_filename(&source, filename.clone());
+                let tokens = lexer.scan_tokens()?;
+                
+                let mut parser = shitrust::parser::Parser::new(tokens);
+                let program = parser.parse()?;
+                
+                let mut type_checker = TypeChecker::new();
+                type_checker.check_program(&program.statements)?;
+                
+                println!("{}", "Type check passed".green().bold());
+            }
+            
             match compiler.run_with_filename(&source, Some(filename)) {
                 Ok(_) => Ok(()),
                 Err(e) => {
@@ -163,6 +217,71 @@ fn main() -> Result<()> {
                         eprintln!("{}", sr_err.format_error());
                     } else {
                         eprintln!("{}: {}", "Error".red().bold(), e);
+                    }
+                    Err(e)
+                }
+            }
+        }
+        Commands::RunAsync { input } => {
+            println!("{} {} in async mode", "Running".green().bold(), 
+                input.display().to_string().cyan());
+            
+            let source = fs::read_to_string(input)
+                .with_context(|| format!("Failed to read file: {}", input.display()))?;
+            
+            let filename = input.to_string_lossy().to_string();
+            
+            // Type check if strict types are enabled
+            if cli.strict_types {
+                let mut lexer = shitrust::lexer::Lexer::with_filename(&source, filename.clone());
+                let tokens = lexer.scan_tokens()?;
+                
+                let mut parser = shitrust::parser::Parser::new(tokens);
+                let program = parser.parse()?;
+                
+                let mut type_checker = TypeChecker::new();
+                type_checker.check_program(&program.statements)?;
+            }
+            
+            // Run with async runtime
+            match compiler.run_async_with_filename(&source, Some(filename)) {
+                Ok(_) => Ok(()),
+                Err(e) => {
+                    if let Some(sr_err) = e.downcast_ref::<ShitRustError>() {
+                        eprintln!("{}", sr_err.format_error());
+                    } else {
+                        eprintln!("{}: {}", "Error".red().bold(), e);
+                    }
+                    Err(e)
+                }
+            }
+        }
+        Commands::Check { input } => {
+            println!("{} {}", "Type checking".green().bold(), 
+                input.display().to_string().cyan());
+            
+            let source = fs::read_to_string(input)
+                .with_context(|| format!("Failed to read file: {}", input.display()))?;
+            
+            let filename = input.to_string_lossy().to_string();
+            
+            let mut lexer = shitrust::lexer::Lexer::with_filename(&source, filename);
+            let tokens = lexer.scan_tokens()?;
+            
+            let mut parser = shitrust::parser::Parser::new(tokens);
+            let program = parser.parse()?;
+            
+            let mut type_checker = TypeChecker::new();
+            match type_checker.check_program(&program.statements) {
+                Ok(_) => {
+                    println!("{}", "Type check passed. No errors found.".green().bold());
+                    Ok(())
+                },
+                Err(e) => {
+                    if let Some(sr_err) = e.downcast_ref::<ShitRustError>() {
+                        eprintln!("{}", sr_err.format_error());
+                    } else {
+                        eprintln!("{}: {}", "Type Error".red().bold(), e);
                     }
                     Err(e)
                 }
@@ -207,6 +326,7 @@ fn main() -> Result<()> {
             
             println!("\n{}", "Compiler Features:".yellow().bold());
             println!("  • LLVM-based optimizing compiler");
+            println!("  • Static type checker");
             println!("  • Interactive interpreter");
             println!("  • Source formatter");
             println!("  • Detailed error reporting");
@@ -215,18 +335,24 @@ fn main() -> Result<()> {
             println!("  • Strong typing with type inference");
             println!("  • Memory safety mechanisms");
             println!("  • First-class functions");
-            println!("  • Structs with methods");
-            println!("  • Pattern matching");
-            println!("  • Error handling");
+            println!("  • Advanced pattern matching");
+            println!("  • Structs and traits");
+            println!("  • Generic types and functions");
+            println!("  • Asynchronous programming");
+            println!("  • Concurrency with threads and locks");
+            println!("  • Cryptography functions");
+            println!("  • Pipeline operator");
             
             println!("\n{}", "Usage Examples:".yellow().bold());
-            println!("  Compile:  {} examples/hello.sr", "shitrust compile".cyan());
-            println!("  Run:      {} examples/hello.sr", "shitrust run".cyan());
-            println!("  Format:   {} -i examples/hello.sr", "shitrust format".cyan());
+            println!("  Compile:    {} examples/hello.sr", "shitrust compile".cyan());
+            println!("  Run:        {} examples/hello.sr", "shitrust run".cyan());
+            println!("  Type check: {} examples/hello.sr", "shitrust check".cyan());
+            println!("  Run async:  {} examples/async.sr", "shitrust run-async".cyan());
+            println!("  Format:     {} -i examples/hello.sr", "shitrust format".cyan());
             
             println!("\n{}:", "More Information".yellow().bold());
             println!("  Website: {}", "https://shitrust-lang.org".cyan());
-            println!("  GitHub:  {}", "https://github.com/yourname/shitrust".cyan());
+            println!("  GitHub:  {}", "https://github.com/Waowzar/shitrust".cyan());
             println!("  Docs:    {}", "https://docs.shitrust-lang.org".cyan());
             
             Ok(())
