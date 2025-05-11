@@ -22,6 +22,7 @@ pub struct CompilerOptions {
     pub show_timings: bool,     // New option to display timing information
     pub emit_llvm_ir: bool,     // New option to save LLVM IR to a file
     pub color_output: bool,     // New option to control colored output
+    pub strict_type_checking: bool,
 }
 
 /// LLVM optimization levels
@@ -42,6 +43,7 @@ impl Default for CompilerOptions {
             show_timings: false,
             emit_llvm_ir: false,
             color_output: true,
+            strict_type_checking: false,
         }
     }
 }
@@ -374,6 +376,54 @@ impl Compiler {
             } else {
                 println!("Program execution completed in {}", time_str);
             }
+        }
+        
+        Ok(())
+    }
+
+    /// Run a ShitRust program with asynchronous support from source string with an optional filename
+    pub fn run_async_with_filename(&self, source: &str, filename: Option<String>) -> Result<()> {
+        let start_time = std::time::Instant::now();
+        
+        // Create lexer
+        let mut lexer = Lexer::with_filename(source, filename.unwrap_or_else(|| "unknown".to_string()));
+        
+        // Show timing if requested
+        if self.options.show_timings {
+            println!("{}: {:.2?}", "Lexing time".yellow().bold(), start_time.elapsed());
+        }
+        
+        // Scan tokens
+        let tokens = lexer.scan_tokens()?;
+        
+        // Create parser
+        let mut parser = Parser::new(tokens);
+        
+        // Parse into AST
+        let parse_start = std::time::Instant::now();
+        let program = parser.parse()?;
+        
+        // Show timing if requested
+        if self.options.show_timings {
+            println!("{}: {:.2?}", "Parsing time".yellow().bold(), parse_start.elapsed());
+        }
+        
+        // Execute with async runtime
+        let execution_start = std::time::Instant::now();
+        
+        // Create interpreter
+        let mut interpreter = Interpreter::new();
+        
+        // Add AsyncRuntime to the environment
+        interpreter.load_module("stdlib::async_runtime")?;
+        
+        // Execute program
+        interpreter.execute_async(&program)?;
+        
+        // Show timing if requested
+        if self.options.show_timings {
+            println!("{}: {:.2?}", "Execution time".yellow().bold(), execution_start.elapsed());
+            println!("{}: {:.2?}", "Total time".yellow().bold(), start_time.elapsed());
         }
         
         Ok(())
